@@ -4,7 +4,8 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { useEffect, useState } from 'react';
 
 export function TelaSegura() {
-  const [access, setAccess] = useState[false];
+  
+  const [access, setAccess] = useState(false);
 
   useEffect(() => {
     (async () => {
