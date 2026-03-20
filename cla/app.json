@@ -2,7 +2,7 @@
   "expo": {
     "name": "CLA - Controle de Licenças Ambientais",
     "slug": "cla",
-    "version": "26.03.071",
+    "version": "26.03.1903",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
