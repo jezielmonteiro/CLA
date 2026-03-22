@@ -1,33 +1,53 @@
-🌎 Controle de Licenças Ambientais (CLA)
+  <title>Controle de Licenças Ambientais (CLA)</title>
+</head>
+<body>
 
-Aplicativo desenvolvido com o objetivo de gerenciar e acompanhar licenças ambientais de forma prática e eficiente. Este projeto foi criado como parte da disciplina Laboratório de Desenvolvimento de Aplicativos Híbridos.
+  <h1>🌎 Controle de Licenças Ambientais (CLA)</h1>
 
-📚 Sobre o Projeto
+  <p>
+    Aplicativo desenvolvido com o objetivo de gerenciar e acompanhar licenças ambientais 
+    de forma prática e eficiente. Este projeto foi criado como parte da disciplina 
+    <strong>Laboratório de Desenvolvimento de Aplicativos Híbridos</strong>.
+  </p>
 
-O CLA (Controle de Licenças Ambientais) é uma aplicação que permite:
+  <h2>📚 Sobre o Projeto</h2>
 
-📄 Cadastro de licenças ambientais
-⏳ Controle de prazos e vencimentos
-🔍 Consulta e visualização de registros
-✏️ Atualização de informações
-🗑️ Remoção de dados cadastrados
+  <p>O <strong>CLA (Controle de Licenças Ambientais)</strong> é uma aplicação que permite:</p>
 
-O sistema busca facilitar a organização e o acompanhamento de processos ambientais, contribuindo para maior controle e conformidade.
+  <ul>
+    <li>📄 Cadastro de licenças ambientais</li>
+    <li>⏳ Controle de prazos e vencimentos</li>
+    <li>🔍 Consulta e visualização de registros</li>
+    <li>✏️ Atualização de informações</li>
+    <li>🗑️ Remoção de dados cadastrados</li>
+  </ul>
 
-🛠️ Tecnologias Utilizadas
-Framework híbrido com React Native
-JavaScript
+  <p>
+    O sistema busca facilitar a organização e o acompanhamento de processos ambientais, 
+    contribuindo para maior controle e conformidade.
+  </p>
 
-🎯 Objetivo Acadêmico
+  <h2>🛠️ Tecnologias Utilizadas</h2>
 
-Este projeto foi desenvolvido como atividade prática da disciplina:
+  <ul>
+    <li>React Native com Expo (aplicação multiplataforma)</li>
+    <li>JavaScript</li>
+  </ul>
 
-Laboratório de Desenvolvimento de Aplicativos Híbridos
-Professor: Tássio Sirqueira
+  <h2>🎯 Objetivo Acadêmico</h2>
 
-🚀 Como Executar o Projeto
+  <p>Este projeto foi desenvolvido como atividade prática da disciplina:</p>
+
+  <p>
+    Laboratório de Desenvolvimento de Aplicativos Híbridos<br>
+    Professor: Tássio Sirqueira
+  </p>
+
+  <h2>🚀 Como Executar o Projeto</h2>
+
+  <pre>
 # Clone o repositório
-git clone <url-do-repositorio>
+git clone &lt;url-do-repositorio&gt;
 
 # Acesse a pasta
 cd nome-do-projeto
@@ -36,15 +56,23 @@ cd nome-do-projeto
 npm install
 
 # Execute o projeto
-npm start
-📌 Status do Projeto
+npx expo start
+  </pre>
 
-🚧 Em desenvolvimento
+  <h2>📌 Status do Projeto</h2>
 
-📄 Licença
+  <p>🚧 Em desenvolvimento</p>
 
-Este projeto é de caráter acadêmico e não possui fins comerciais.
+  <h2>📄 Licença</h2>
 
-## 🧑‍💻 Alunos:
+  <p>
+    Este projeto é de caráter acadêmico e não possui fins comerciais.
+  </p>
 
-[Jeziel Luiz Monteiro Farani](https://github.com/jezielmonteiro), [Luann Pereira Mendes](https://github.com/Luann8) e [Luiz Henrique Souza Nascimento](https://github.com/LuizinSouza).
+  <h2>🧑‍💻 Alunos</h2>
+
+  <ul>
+    <li><a href="https://github.com/jezielmonteiro" target="_blank">Jeziel Luiz Monteiro Farani</a></li>
+    <li><a href="https://github.com/Luann8" target="_blank">Luann Pereira Mendes</a></li>
+    <li><a href="https://github.com/LuizinSouza" target="_blank">Luiz Henrique Souza Nascimento</a></li>
+  </ul>
