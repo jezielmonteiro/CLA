@@ -1,6 +1,3 @@
-  <title>Controle de Licenças Ambientais (CLA)</title>
-</head>
-<body>
 
   <h1>🌎 Controle de Licenças Ambientais (CLA)</h1>
 
