@@ -44,7 +44,7 @@
 
   <pre>
 # Clone o repositório
-git clone &lt;url-do-repositorio&gt;
+git clone https://github.com/jezielmonteiro/CLA.git;
 
 # Acesse a pasta
 cd nome-do-projeto
@@ -53,7 +53,7 @@ cd nome-do-projeto
 npm install
 
 # Execute o projeto
-npx expo start
+npx expo start --tunnel
   </pre>
 
   <h2>📌 Status do Projeto</h2>
