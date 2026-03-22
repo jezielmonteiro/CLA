@@ -35,6 +35,43 @@ const STORAGE_KEY = '@cla_licencas';
 const DEFAULT_PASSWORD = '123456';
 const { width, height } = Dimensions.get('window');
 
+// Função para converter string de data para objeto Date
+const converterDataParaDate = (dataString) => {
+  if (!dataString) return null;
+  // Formato esperado: dd/mm/aaaa
+  const partes = dataString.split('/');
+  if (partes.length !== 3) return null;
+  const dia = parseInt(partes[0], 10);
+  const mes = parseInt(partes[1], 10) - 1; // Mês em JS é 0-11
+  const ano = parseInt(partes[2], 10);
+  return new Date(ano, mes, dia);
+};
+
+// Função para calcular status baseado na data (string)
+const calcularStatusPorData = (validadeString) => {
+  if (!validadeString) return 'Sem data';
+  
+  const dataValidade = converterDataParaDate(validadeString);
+  if (!dataValidade) return 'Data inválida';
+  
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0); // Zera as horas para comparação apenas de datas
+  dataValidade.setHours(0, 0, 0, 0);
+  
+  const diffTime = dataValidade - hoje;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays < 0) {
+    return 'Vencida';
+  } else if (diffDays === 0) {
+    return 'Vence hoje';
+  } else if (diffDays <= 30) {
+    return `Vence em ${diffDays} dias`;
+  } else {
+    return 'Válida';
+  }
+};
+
 // Componente principal da aplicação
 function AppContent() {
   const insets = useSafeAreaInsets();
@@ -110,10 +147,24 @@ function AppContent() {
     try {
       const json = await AsyncStorage.getItem(STORAGE_KEY);
       if (json) {
-        setLicencas(JSON.parse(json));
+        const licencasCarregadas = JSON.parse(json);
+        // Atualiza os status de todas as licenças baseado na data atual
+        const licencasAtualizadas = licencasCarregadas.map(licenca => ({
+          ...licenca,
+          status: calcularStatusPorData(licenca.validade),
+          cor: getCorPorStatus(calcularStatusPorData(licenca.validade)),
+          sigla: getSigla(calcularStatusPorData(licenca.validade))
+        }));
+        setLicencas(licencasAtualizadas);
       } else {
-        setLicencas(initialLicencas);
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(initialLicencas));
+        const licencasIniciais = initialLicencas.map(licenca => ({
+          ...licenca,
+          status: calcularStatusPorData(licenca.validade),
+          cor: getCorPorStatus(calcularStatusPorData(licenca.validade)),
+          sigla: getSigla(calcularStatusPorData(licenca.validade))
+        }));
+        setLicencas(licencasIniciais);
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(licencasIniciais));
       }
     } catch (e) {
       console.error('Erro ao carregar licenças:', e);
@@ -189,31 +240,39 @@ function AppContent() {
   const getCorPorStatus = (status) => {
     if (!status) return '#6b7280';
     const lowerStatus = status.toLowerCase();
-    if (lowerStatus.includes('vence')) return '#f59e0b';
+    if (lowerStatus.includes('vence') || lowerStatus.includes('hoje')) return '#f59e0b';
     if (lowerStatus.includes('vencida')) return '#ef4444';
     return '#10b981';
   };
 
   const getSigla = (status) => {
     if (!status) return 'LIC';
+    if (status.includes('Vence')) return 'VNC';
+    if (status.includes('Vencida')) return 'VCD';
+    if (status.includes('Válida')) return 'VAL';
     return status.substring(0, 3).toUpperCase();
   };
 
   const adicionarOuEditar = async (novoItem) => {
     let novaLista;
+    const statusCalculado = calcularStatusPorData(novoItem.validade);
+    const novoItemCompleto = {
+      ...novoItem,
+      status: statusCalculado,
+      cor: getCorPorStatus(statusCalculado),
+      sigla: getSigla(statusCalculado),
+    };
+    
     if (editingItem) {
       novaLista = licencas.map((i) => 
-        i.id === editingItem.id ? { ...i, ...novoItem } : i
+        i.id === editingItem.id ? { ...i, ...novoItemCompleto, latitude: selectedLocation?.latitude || i.latitude, longitude: selectedLocation?.longitude || i.longitude } : i
       );
       setEditingItem(null);
     } else {
       const novoId = Date.now().toString();
-      const statusAtualizado = novoItem.status || 'Válida';
       novaLista = [...licencas, {
-        ...novoItem,
+        ...novoItemCompleto,
         id: novoId,
-        cor: getCorPorStatus(statusAtualizado),
-        sigla: getSigla(statusAtualizado),
         latitude: selectedLocation?.latitude || null,
         longitude: selectedLocation?.longitude || null,
       }];
@@ -268,6 +327,7 @@ function AppContent() {
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
+          keyboardType="email-address"
         />
         <TextInput
           style={styles.input}
@@ -275,6 +335,7 @@ function AppContent() {
           value={senha}
           onChangeText={setSenha}
           secureTextEntry
+          keyboardType="number-pad"
         />
 
         {isBiometricCompatible !== null && (
@@ -542,9 +603,33 @@ function AppContent() {
           />
         );
       case 'stats':
-        const validas = licencas.filter(l => l.status?.toLowerCase().includes('válida') && !l.status?.toLowerCase().includes('vence')).length;
-        const vencendo = licencas.filter(l => l.status?.toLowerCase().includes('vence')).length;
-        const vencidas = licencas.filter(l => l.status?.toLowerCase().includes('vencida')).length;
+        // Calcular estatísticas baseadas na data (string)
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        
+        const validas = licencas.filter(l => {
+          const dataValidade = converterDataParaDate(l.validade);
+          if (!dataValidade) return false;
+          dataValidade.setHours(0, 0, 0, 0);
+          const diffDays = Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
+          return diffDays > 30;
+        }).length;
+        
+        const vencendo = licencas.filter(l => {
+          const dataValidade = converterDataParaDate(l.validade);
+          if (!dataValidade) return false;
+          dataValidade.setHours(0, 0, 0, 0);
+          const diffDays = Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
+          return diffDays >= 0 && diffDays <= 30;
+        }).length;
+        
+        const vencidas = licencas.filter(l => {
+          const dataValidade = converterDataParaDate(l.validade);
+          if (!dataValidade) return false;
+          dataValidade.setHours(0, 0, 0, 0);
+          const diffDays = Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
+          return diffDays < 0;
+        }).length;
         
         return (
           <ScrollView style={styles.statsContainer} contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 80 }}>
@@ -563,44 +648,23 @@ function AppContent() {
                 <MaterialCommunityIcons name="check-circle" size={32} color="#10b981" />
                 <Text style={[styles.statBoxNumber, { color: '#10b981' }]}>{validas}</Text>
                 <Text style={styles.statBoxLabel}>Válidas</Text>
+                <Text style={styles.statBoxSubLabel}>(+30 dias)</Text>
               </View>
               
               <View style={[styles.statBox, { backgroundColor: '#f59e0b20' }]}>
                 <MaterialCommunityIcons name="clock-alert" size={32} color="#f59e0b" />
                 <Text style={[styles.statBoxNumber, { color: '#f59e0b' }]}>{vencendo}</Text>
                 <Text style={styles.statBoxLabel}>Vencem em breve</Text>
+                <Text style={styles.statBoxSubLabel}>(até 30 dias)</Text>
               </View>
               
               <View style={[styles.statBox, { backgroundColor: '#ef444420' }]}>
                 <MaterialCommunityIcons name="alert-circle" size={32} color="#ef4444" />
                 <Text style={[styles.statBoxNumber, { color: '#ef4444' }]}>{vencidas}</Text>
                 <Text style={styles.statBoxLabel}>Vencidas</Text>
+                <Text style={styles.statBoxSubLabel}>(data passada)</Text>
               </View>
             </View>
-
-            <TouchableOpacity 
-              style={styles.logoutButton}
-              onPress={async () => {
-                Alert.alert(
-                  'Sair',
-                  'Deseja realmente sair do aplicativo?',
-                  [
-                    { text: 'Cancelar', style: 'cancel' },
-                    {
-                      text: 'Sair',
-                      style: 'destructive',
-                      onPress: async () => {
-                        await SecureStore.deleteItemAsync(SENHA_KEY);
-                        setScreen('login');
-                      }
-                    }
-                  ]
-                );
-              }}
-            >
-              <Icon name="logout" size={24} color="#ef4444" />
-              <Text style={styles.logoutText}>Sair da conta</Text>
-            </TouchableOpacity>
           </ScrollView>
         );
       default:
@@ -612,11 +676,36 @@ function AppContent() {
     <View style={styles.mainContainer}>
       <StatusBar barStyle="light-content" />
       
-      {/* Header simplificado sem ícone */}
+      {/* Header com botão de logout */}
       <View style={styles.headerGradient}>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>CLA</Text>
-          <Text style={styles.headerSubtitle}>Controle de Licenças Ambientais</Text>
+          <View style={styles.headerLeft} />
+          <View style={styles.headerCenter}>
+            <Text style={styles.headerTitle}>CLA</Text>
+            <Text style={styles.headerSubtitle}>Controle de Licenças Ambientais</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.logoutButton}
+            onPress={async () => {
+              Alert.alert(
+                'Sair',
+                'Deseja realmente sair do aplicativo?',
+                [
+                  { text: 'Cancelar', style: 'cancel' },
+                  {
+                    text: 'Sair',
+                    style: 'destructive',
+                    onPress: async () => {
+                      await SecureStore.deleteItemAsync(SENHA_KEY);
+                      setScreen('login');
+                    }
+                  }
+                ]
+              );
+            }}
+          >
+            <Icon name="logout" size={24} color="white" />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -655,14 +744,31 @@ function AppContent() {
   );
 }
 
-// Tela de formulário com botão para abrir mapa
+// Tela de formulário com teclado numérico para data
 function FormLicenca({ item, onSave, onCancel, onOpenCamera, onOpenMap, selectedLocation }) {
   const insets = useSafeAreaInsets();
   const [projeto, setProjeto] = useState(item?.projeto || '');
   const [nome, setNome] = useState(item?.nome || '');
   const [validade, setValidade] = useState(item?.validade || '');
-  const [status, setStatus] = useState(item?.status || 'Válida');
   const [fotoUri, setFotoUri] = useState(item?.fotoUri || null);
+
+  // Função para formatar a data automaticamente enquanto digita
+  const formatarData = (texto) => {
+    let numeros = texto.replace(/\D/g, ''); // Remove tudo que não é número
+    
+    if (numeros.length <= 2) {
+      return numeros;
+    } else if (numeros.length <= 4) {
+      return `${numeros.slice(0, 2)}/${numeros.slice(2)}`;
+    } else {
+      return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(4, 8)}`;
+    }
+  };
+
+  const handleDataChange = (texto) => {
+    const dataFormatada = formatarData(texto);
+    setValidade(dataFormatada);
+  };
 
   const salvar = () => {
     if (!projeto.trim()) {
@@ -677,7 +783,15 @@ function FormLicenca({ item, onSave, onCancel, onOpenCamera, onOpenMap, selected
 
     const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
     if (!dateRegex.test(validade)) {
-      Alert.alert('Formato inválido', 'Use o formato dd/mm/aaaa');
+      Alert.alert('Formato inválido', 'Use o formato dd/mm/aaaa\nExemplo: 31/12/2024');
+      return;
+    }
+
+    // Valida se a data é real
+    const [dia, mes, ano] = validade.split('/');
+    const data = new Date(ano, mes - 1, dia);
+    if (data.getDate() != dia || data.getMonth() + 1 != mes || data.getFullYear() != ano) {
+      Alert.alert('Data inválida', 'Por favor, digite uma data válida');
       return;
     }
 
@@ -685,7 +799,6 @@ function FormLicenca({ item, onSave, onCancel, onOpenCamera, onOpenMap, selected
       projeto, 
       nome, 
       validade, 
-      status, 
       fotoUri,
       latitude: selectedLocation?.latitude || item?.latitude,
       longitude: selectedLocation?.longitude || item?.longitude,
@@ -723,17 +836,24 @@ function FormLicenca({ item, onSave, onCancel, onOpenCamera, onOpenMap, selected
             style={styles.input}
             placeholder="Validade (dd/mm/aaaa) *"
             value={validade}
-            onChangeText={setValidade}
+            onChangeText={handleDataChange}
             maxLength={10}
+            keyboardType="numeric"
+            returnKeyType="done"
           />
           
-          <TextInput
-            style={styles.input}
-            placeholder="Status (ex: Válida / Vence em 30 dias)"
-            value={status}
-            onChangeText={setStatus}
-            maxLength={50}
-          />
+          <View style={styles.infoBox}>
+            <Icon name="info" size={20} color="#10b981" />
+            <Text style={styles.infoText}>
+              Digite a data no formato dd/mm/aaaa. Exemplo: 31122024{'\n'}
+              A data será formatada automaticamente.{'\n\n'}
+              O status será calculado automaticamente:{'\n'}
+              • Válida (+30 dias){'\n'}
+              • Vence em breve (até 30 dias){'\n'}
+              • Vence hoje{'\n'}
+              • Vencida (data passada)
+            </Text>
+          </View>
 
           <TouchableOpacity 
             style={styles.locationButton}
@@ -794,7 +914,7 @@ export default function App() {
   );
 }
 
-// Estilos atualizados
+// Estilos (mantidos os mesmos do código anterior)
 const styles = StyleSheet.create({
   // Login
   loginContainer: { flex: 1, backgroundColor: '#f8fafc', justifyContent: 'center', padding: 40 },
@@ -820,11 +940,28 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   headerContent: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  headerLeft: {
+    width: 40,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
   },
   headerTitle: { color: 'white', fontSize: 28, fontWeight: 'bold' },
   headerSubtitle: { color: 'white', fontSize: 12, marginTop: 2, opacity: 0.9 },
+  logoutButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
   // Cards
   modernCard: {
@@ -878,7 +1015,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // Bottom Tab Bar - Novo layout
+  // Bottom Tab Bar
   bottomTabBar: {
     flexDirection: 'row',
     backgroundColor: 'white',
@@ -914,9 +1051,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: -20,
-  },
-  tabItemActive: {
-    // estilo ativo
   },
   tabLabel: {
     fontSize: 12,
@@ -966,7 +1100,7 @@ const styles = StyleSheet.create({
   statItem: { alignItems: 'center' },
   statNumber: { fontSize: 48, fontWeight: 'bold', color: '#10b981', marginVertical: 8 },
   statLabel: { fontSize: 16, color: '#6b7280' },
-  statsGrid: { flexDirection: 'row', justifyContent: 'space-between', gap: 16, marginBottom: 24 },
+  statsGrid: { flexDirection: 'row', justifyContent: 'space-between', gap: 16 },
   statBox: {
     flex: 1,
     backgroundColor: 'white',
@@ -981,17 +1115,7 @@ const styles = StyleSheet.create({
   },
   statBoxNumber: { fontSize: 28, fontWeight: 'bold', marginVertical: 8 },
   statBoxLabel: { fontSize: 12, color: '#6b7280', textAlign: 'center' },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fee2e2',
-    padding: 16,
-    borderRadius: 16,
-    gap: 12,
-    marginTop: 16,
-  },
-  logoutText: { fontSize: 16, color: '#ef4444', fontWeight: '600' },
+  statBoxSubLabel: { fontSize: 10, color: '#9ca3af', marginTop: 4, textAlign: 'center' },
 
   // Formulário
   formContainer: { flex: 1, backgroundColor: '#f8fafc', padding: 24 },
@@ -1007,6 +1131,21 @@ const styles = StyleSheet.create({
   saveButton: { backgroundColor: '#10b981', padding: 18, borderRadius: 16, alignItems: 'center', marginTop: 24, flexDirection: 'row', justifyContent: 'center' },
   cancelButton: { backgroundColor: '#f87171', padding: 18, borderRadius: 16, alignItems: 'center', marginTop: 16, flexDirection: 'row', justifyContent: 'center' },
   cancelButtonText: { color: 'white', fontSize: 18, fontWeight: '600' },
+  infoBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#d1fae5',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+    gap: 8,
+  },
+  infoText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#065f46',
+    lineHeight: 18,
+  },
 
   // Detalhes
   detailContainer: { flex: 1, backgroundColor: '#f8fafc', padding: 24 },
