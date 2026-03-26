@@ -85,11 +85,9 @@ function AppContent() {
   const [editingItem, setEditingItem] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showMap, setShowMap] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [activeTab, setActiveTab] = useState('home');
-
   const [permissionCamera, requestPermissionCamera] = useCameraPermissions();
   const cameraRef = useRef(null);
   const mapRef = useRef(null);
@@ -280,9 +278,8 @@ function AppContent() {
     
     const sucesso = await saveLicencas(novaLista);
     if (sucesso) {
-      setShowMap(false);
-      setSelectedLocation(null);
       setScreen('main');
+      setSelectedLocation(null);
     }
   };
 
@@ -388,7 +385,7 @@ function AppContent() {
                 }
               }}
             >
-              <Text style={styles.captureText}>📸 Tirar foto</Text>
+              <Text style={styles.captureText}>Tirar foto</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => setScreen('form')}>
@@ -413,7 +410,7 @@ function AppContent() {
         onOpenCamera={() => setScreen('camera')}
         onOpenMap={() => {
           setSelectedLocation(null);
-          setShowMap(true);
+          setScreen('map');
         }}
         selectedLocation={selectedLocation}
       />
@@ -421,7 +418,7 @@ function AppContent() {
   }
 
   // Tela do Mapa
-  if (showMap) {
+  if (screen === 'map') {
     return (
       <View style={styles.mapContainer}>
         <StatusBar barStyle="dark-content" />
@@ -453,7 +450,7 @@ function AppContent() {
         <View style={styles.mapButtons}>
           <TouchableOpacity
             style={styles.mapConfirmButton}
-            onPress={() => setShowMap(false)}
+            onPress={() => setScreen('form')}
           >
             <Text style={styles.mapButtonText}>Confirmar Localização</Text>
           </TouchableOpacity>
@@ -462,7 +459,7 @@ function AppContent() {
             style={styles.mapCancelButton}
             onPress={() => {
               setSelectedLocation(null);
-              setShowMap(false);
+              setScreen('form');
             }}
           >
             <Text style={styles.mapButtonText}>Cancelar</Text>
