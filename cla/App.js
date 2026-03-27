@@ -26,9 +26,7 @@ import * as Location from 'expo-location';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
-// Seu arquivo de licenças iniciais
-import { licenca as initialLicencas } from './licencas';
+import { licenca as initialLicencas } from './licencas'; // Seu arquivo de licenças iniciais
 
 const SENHA_KEY = 'cla_user_password';
 const STORAGE_KEY = '@cla_licencas';
@@ -263,7 +261,7 @@ function AppContent() {
     
     if (editingItem) {
       novaLista = licencas.map((i) => 
-        i.id === editingItem.id ? { ...i, ...novoItemCompleto, latitude: selectedLocation?.latitude || i.latitude, longitude: selectedLocation?.longitude || i.longitude } : i
+        i.id === editingItem.id ? { ...i, ...novoItemCompleto, latitude: selectedLocation === null ? null : selectedLocation?.latitude ?? i.latitude, longitude: selectedLocation === null ? null : selectedLocation?.longitude ?? i.longitude, } : i
       );
       setEditingItem(null);
     } else {
@@ -271,8 +269,8 @@ function AppContent() {
       novaLista = [...licencas, {
         ...novoItemCompleto,
         id: novoId,
-        latitude: selectedLocation?.latitude || null,
-        longitude: selectedLocation?.longitude || null,
+        latitude: selectedLocation === null ? null : selectedLocation?.latitude ?? null,
+        longitude: selectedLocation === null ? null : selectedLocation?.longitude ?? null,
       }];
     }
     
@@ -413,6 +411,7 @@ function AppContent() {
           setScreen('map');
         }}
         selectedLocation={selectedLocation}
+        setSelectedLocation={setSelectedLocation}
       />
     );
   }
@@ -452,7 +451,7 @@ function AppContent() {
             style={styles.mapConfirmButton}
             onPress={() => setScreen('form')}
           >
-            <Text style={styles.mapButtonText}>Confirmar Localização</Text>
+            <Text style={styles.mapButtonText}>Confirmar</Text>
           </TouchableOpacity>
           
           <TouchableOpacity
@@ -742,12 +741,13 @@ function AppContent() {
 }
 
 // Tela de formulário com teclado numérico para data
-function FormLicenca({ item, onSave, onCancel, onOpenCamera, onOpenMap, selectedLocation }) {
+function FormLicenca({ item, onSave, onCancel, onOpenCamera, onOpenMap, selectedLocation, setSelectedLocation }) {
   const insets = useSafeAreaInsets();
   const [projeto, setProjeto] = useState(item?.projeto || '');
   const [nome, setNome] = useState(item?.nome || '');
   const [validade, setValidade] = useState(item?.validade || '');
   const [fotoUri, setFotoUri] = useState(item?.fotoUri || null);
+  const [locationRemoved, setLocationRemoved] = useState(false);
 
   // Função para formatar a data automaticamente enquanto digita
   const formatarData = (texto) => {
@@ -797,8 +797,8 @@ function FormLicenca({ item, onSave, onCancel, onOpenCamera, onOpenMap, selected
       nome, 
       validade, 
       fotoUri,
-      latitude: selectedLocation?.latitude || item?.latitude,
-      longitude: selectedLocation?.longitude || item?.longitude,
+      latitude: (selectedLocation?.latitude || item?.latitude),
+      longitude: (selectedLocation?.longitude || item?.longitude),
     });
   };
 
@@ -859,10 +859,23 @@ function FormLicenca({ item, onSave, onCancel, onOpenCamera, onOpenMap, selected
           >
             <Icon name="location-on" size={20} color="#4338ca" />
             <Text style={styles.locationButtonText}>
-              {selectedLocation || item?.latitude ? 'Localização selecionada' : 'Adicionar localização no mapa'}
+              {(selectedLocation || item?.latitude) && !locationRemoved ? 'Localização selecionada' : 'Adicionar localização'}
             </Text>
+            
+            {(selectedLocation || item?.latitude && !locationRemoved) && (
+              <TouchableOpacity 
+                onPress={() => {
+                  setSelectedLocation(null);
+                  setLocationRemoved(true);
+                }}
+                style={styles.removeLocationButton}
+              >
+              <Icon name="delete" size={20} color="#ef4444" />
+              <Text style={styles.removeLocationText}>Excluir</Text>
+              </TouchableOpacity>
+            )}
           </TouchableOpacity>
-
+          
           <TouchableOpacity 
             style={styles.photoButton} 
             onPress={onOpenCamera}
@@ -882,7 +895,7 @@ function FormLicenca({ item, onSave, onCancel, onOpenCamera, onOpenMap, selected
                 style={styles.removePhotoButton}
               >
                 <Icon name="delete" size={20} color="#ef4444" />
-                <Text style={styles.removePhotoText}>Remover foto</Text>
+                <Text style={styles.removePhotoText}>Excluir</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -924,192 +937,49 @@ const styles = StyleSheet.create({
 
   // Principal
   mainContainer: { flex: 1, backgroundColor: '#f8fafc' },
-  headerGradient: { 
-    backgroundColor: '#10b981',
-    paddingTop: 60,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-  },
-  headerLeft: {
-    width: 40,
-  },
-  headerCenter: {
-    flex: 1,
-    alignItems: 'center',
-  },
+  headerGradient: { backgroundColor: '#10b981', paddingTop: 60, paddingBottom: 20, borderBottomLeftRadius: 30, borderBottomRightRadius: 30, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 5 },
+  headerContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 },
+  headerLeft: { width: 40 },
+  headerCenter: { flex: 1, alignItems: 'center' },
   headerTitle: { color: 'white', fontSize: 28, fontWeight: 'bold' },
   headerSubtitle: { color: 'white', fontSize: 12, marginTop: 2, opacity: 0.9 },
-  logoutButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  logoutButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
 
   // Cards
-  modernCard: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    marginBottom: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    position: 'relative',
-  },
+  modernCard: { backgroundColor: 'white', borderRadius: 20, marginBottom: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 4, position: 'relative' },
   cardImage: { width: '100%', height: 160, borderRadius: 16, marginBottom: 12 },
   cardContent: { flex: 1 },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   cardTitle: { fontSize: 20, fontWeight: '700', color: '#111827', flex: 1, marginRight: 12 },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  statusBadgeText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
+  statusBadge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
+  statusBadgeText: { color: 'white', fontWeight: 'bold', fontSize: 12 },
   cardSubtitle: { fontSize: 15, color: '#6b7280', marginTop: 4, marginBottom: 8 },
   cardDateContainer: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
   cardDate: { fontSize: 14, color: '#9ca3af', marginLeft: 4 },
   cardStatus: { fontSize: 15, fontWeight: '600', marginTop: 4 },
-  cardActions: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    flexDirection: 'row',
-    gap: 12,
-  },
-  actionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#f3f4f6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  cardActions: { position: 'absolute', bottom: 20, right: 20, flexDirection: 'row', gap: 12 },
+  actionButton: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center' },
 
   // Bottom Tab Bar
-  bottomTabBar: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 8,
-    alignItems: 'flex-end',
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-  },
-  tabItemLeft: {
-    alignItems: 'center',
-    paddingLeft: 20,
-  },
-  tabItemRight: {
-    alignItems: 'center',
-    paddingRight: 20,
-  },
-  tabItemCenter: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: -20,
-  },
-  tabLabel: {
-    fontSize: 12,
-    color: '#9ca3af',
-    marginTop: 4,
-    fontWeight: '500',
-  },
-  tabLabelActive: {
-    color: '#10b981',
-    fontWeight: '600',
-  },
-  addButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#10b981',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  addButtonLabel: {
-    fontSize: 11,
-    color: '#10b981',
-    marginTop: 4,
-    fontWeight: '600',
-  },
+  bottomTabBar: { flexDirection: 'row', backgroundColor: 'white', paddingVertical: 12, borderTopWidth: 1, borderTopColor: '#f0f0f0', position: 'absolute', bottom: 0, left: 0, right: 0, shadowColor: '#000', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 8, alignItems: 'flex-end' },
+  tabItem: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 8 },
+  tabItemLeft: { alignItems: 'center', paddingLeft: 20 },
+  tabItemRight: { alignItems: 'center', paddingRight: 20 },
+  tabItemCenter: { alignItems: 'center', justifyContent: 'center', marginTop: -20 },
+  tabLabel: { fontSize: 12, color: '#9ca3af', marginTop: 4, fontWeight: '500' },
+  tabLabelActive: { color: '#10b981', fontWeight: '600' },
+  addButton: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#10b981', justifyContent: 'center', alignItems: 'center', shadowColor: '#10b981', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+  addButtonLabel: { fontSize: 11, color: '#10b981', marginTop: 4, fontWeight: '600' },
 
   // Estatísticas
   statsContainer: { flex: 1, backgroundColor: '#f8fafc' },
   statsTitle: { fontSize: 28, fontWeight: 'bold', color: '#111827', marginBottom: 24 },
-  statsCard: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+  statsCard: { backgroundColor: 'white', borderRadius: 20, padding: 24, marginBottom: 20, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
   statItem: { alignItems: 'center' },
   statNumber: { fontSize: 48, fontWeight: 'bold', color: '#10b981', marginVertical: 8 },
   statLabel: { fontSize: 16, color: '#6b7280' },
   statsGrid: { flexDirection: 'row', justifyContent: 'space-between', gap: 16 },
-  statBox: {
-    flex: 1,
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+  statBox: { flex: 1, backgroundColor: 'white', borderRadius: 16, padding: 20, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
   statBoxNumber: { fontSize: 28, fontWeight: 'bold', marginVertical: 8 },
   statBoxLabel: { fontSize: 12, color: '#6b7280', textAlign: 'center' },
   statBoxSubLabel: { fontSize: 10, color: '#9ca3af', marginTop: 4, textAlign: 'center' },
@@ -1117,6 +987,7 @@ const styles = StyleSheet.create({
   // Formulário
   formContainer: { flex: 1, backgroundColor: '#f8fafc', padding: 24 },
   titleForm: { fontSize: 28, fontWeight: 'bold', color: '#111827', marginBottom: 24 },
+  input: { backgroundColor: 'white', padding: 16, borderRadius: 12, marginBottom: 16, borderWidth: 1, borderColor: '#e2e8f0', fontSize: 16, color: '#1e293b' },
   photoButton: { backgroundColor: '#6ee7b7', padding: 16, borderRadius: 12, alignItems: 'center', marginVertical: 8, flexDirection: 'row', justifyContent: 'center', gap: 8 },
   photoButtonText: { color: '#065f46', fontSize: 16, fontWeight: '600' },
   locationButton: { backgroundColor: '#e0e7ff', padding: 16, borderRadius: 12, alignItems: 'center', marginVertical: 8, flexDirection: 'row', justifyContent: 'center', gap: 8 },
@@ -1125,24 +996,14 @@ const styles = StyleSheet.create({
   photoPreview: { width: 200, height: 200, borderRadius: 12, marginBottom: 8 },
   removePhotoButton: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8 },
   removePhotoText: { color: '#ef4444', fontSize: 14, fontWeight: '600' },
+  removeLocationButton: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8 },
+  removeLocationText: { color: '#ef4444', fontSize: 14, fontWeight: '600' },
   saveButton: { backgroundColor: '#10b981', padding: 18, borderRadius: 16, alignItems: 'center', marginTop: 24, flexDirection: 'row', justifyContent: 'center' },
+  buttonText: { color: 'white', fontSize: 18, fontWeight: '600' },
   cancelButton: { backgroundColor: '#f87171', padding: 18, borderRadius: 16, alignItems: 'center', marginTop: 16, flexDirection: 'row', justifyContent: 'center' },
   cancelButtonText: { color: 'white', fontSize: 18, fontWeight: '600' },
-  infoBox: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#d1fae5',
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 16,
-    gap: 8,
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 12,
-    color: '#065f46',
-    lineHeight: 18,
-  },
+  infoBox: { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: '#d1fae5', padding: 12, borderRadius: 12, marginBottom: 16, gap: 8 },
+  infoText: { flex: 1, fontSize: 12, color: '#065f46', lineHeight: 18 },
 
   // Detalhes
   detailContainer: { flex: 1, backgroundColor: '#f8fafc', padding: 24 },
@@ -1162,31 +1023,10 @@ const styles = StyleSheet.create({
   // Mapa
   mapContainer: { flex: 1 },
   map: { flex: 1 },
-  mapButtons: {
-    position: 'absolute',
-    bottom: 40,
-    left: 20,
-    right: 20,
-    gap: 12,
-  },
-  mapConfirmButton: {
-    backgroundColor: '#10b981',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  mapCancelButton: {
-    backgroundColor: '#ef4444',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  mapButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  mapButtons: { position: 'absolute', bottom: 40, left: 20, right: 20, gap: 12 },
+  mapConfirmButton: { backgroundColor: '#10b981', padding: 16, borderRadius: 12, alignItems: 'center', marginBottom: 12 },
+  mapCancelButton: { backgroundColor: '#ef4444', padding: 16, borderRadius: 12, alignItems: 'center' },
+  mapButtonText: { color: 'white', fontSize: 16, fontWeight: '600' },
 
   // Câmera
   cameraContainer: { flex: 1 },
