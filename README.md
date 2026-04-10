@@ -1,56 +1,70 @@
-# CLA - Sistema de Controle de Licenças Ambientais 🌱 (Versão Beta/Demo)
+<header style="text-align:center; margin-bottom:20px;">
 
-> ⚠️ **Aviso Importante:** Este repositório é uma versão **Demo/Beta** do sistema CLA. Ele funciona como meu ambiente de desenvolvimento pessoal e área de testes ("sandbox") antes que as alterações sejam enviadas para o repositório oficial da equipe. Por ser o meu ambiente de uso diário, **este repositório contém o código mais atualizado**, incluindo testes recentes, novas funcionalidades e experimentos em andamento.
+  <h1>🌎 Controle de Licenças Ambientais (CLA)</h1>
 
-O **CLA (Controle de Licenças Ambientais)** é um aplicativo móvel desenvolvido para facilitar o gerenciamento, consulta e monitoramento de licenças ambientais. O sistema oferece ferramentas para cadastro, acompanhamento de prazos, geolocalização e captura de evidências em campo.
+  <p>Aplicativo para gerenciamento e acompanhamento de licenças ambientais</p>
 
----
+  <!-- Badges -->
+  <p>
+    <img src="https://img.shields.io/badge/React%20Native-Expo-61DAFB?style=for-the-badge&logo=react" />
+    <img src="https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
+    <img src="https://img.shields.io/badge/Camera-Expo%20Camera-black?style=for-the-badge&logo=googlephotos" />
+    <img src="https://img.shields.io/badge/Biometria-Fingerprint-blue?style=for-the-badge&logo=auth0" />
+    <img src="https://img.shields.io/badge/Status-Em%20desenvolvimento-orange?style=for-the-badge" />
+  </p>
 
-## 🚀 Funcionalidades Atuais (Beta)
+</header>
 
-* **Autenticação Segura:** Login no sistema com suporte a autenticação biométrica do dispositivo.
-* **Gestão de Licenças:** Cadastro, visualização de detalhes e acompanhamento do status das licenças ambientais.
-* **Geolocalização (Mapa):** Visualização das licenças e pontos de interesse diretamente no mapa.
-* **Captura de Evidências:** Integração com a câmera do dispositivo para anexar fotos de vistorias e documentos.
-* **Dashboard e Estatísticas:** Painel para análise rápida da situação das licenças (ativas, vencidas, em análise).
-* **Armazenamento Local:** Funcionalidade offline-first com armazenamento de dados essenciais no dispositivo.
+<p>Este projeto foi criado como parte da disciplina <strong>Laboratório de Desenvolvimento de Aplicativos Híbridos</strong>.</p>
 
----
+<h2>📚 Sobre o Projeto</h2>
 
-## 🛠️ Tecnologias Utilizadas
+<p>O <strong>CLA (Controle de Licenças Ambientais)</strong> é uma aplicação que permite:</p>
 
-Este projeto foi desenvolvido utilizando as seguintes tecnologias:
+<ul>
+    <li>📄 Cadastro de licenças ambientais</li>
+    <li>⏳ Controle de prazos e vencimentos</li>
+    <li>🔍 Consulta e visualização de registros</li>
+    <li>✏️ Atualização de informações</li>
+    <li>🗑️ Remoção de dados cadastrados</li>
+    <li>📷 Captura de imagens para anexar às licenças</li>
+    <li>👆 Autenticação por biometria (impressão digital)</li>
+</ul>
 
-* **React Native / Expo** - Framework para desenvolvimento mobile.
-* **JavaScript (ES6+)** - Linguagem principal da aplicação.
-* **React Navigation** - Para gerenciamento de rotas e navegação em abas (Bottom Tab Bar).
-* **Ferramentas Nativas:** Integração com Câmera, Localização (GPS) e Biometria.
+<p>O sistema busca facilitar a organização e o acompanhamento de processos ambientais, contribuindo para maior controle e conformidade.</p>
 
----
+<h2>🛠️ Tecnologias Utilizadas</h2>
 
-## 📁 Estrutura do Projeto
+<ul>
+    <li>React Native com Expo (aplicação multiplataforma)</li>
+    <li>JavaScript</li>
+    <li>Expo Camera</li>
+    <li>Expo Local Authentication (biometria)</li>
+</ul>
 
-A arquitetura do projeto foi pensada para ser escalável e separar bem as responsabilidades:
+<h2>📦 Dependências Extras</h2>
 
-* `/assets` - Imagens, ícones da aplicação e splash screen.
-* `/src/components` - Componentes visuais reutilizáveis (Header, Cards, BottomTabBar, etc).
-* `/src/screens` - Telas principais do aplicativo (Login, Mapa, Formulários, Câmera, Detalhes).
-* `/src/hooks` - Hooks customizados para regras de negócio (Geolocalização, Biometria, Licenças).
-* `/src/services` - Integração com APIs externas, autenticação e armazenamento.
-* `/src/utils` - Funções auxiliares (formatação de datas, status, constantes).
+<h2>Câmera</h2>
+<pre>npx expo install expo-camera</pre>
 
----
+<h2>Autenticação biométrica (impressão digital)</h2>
+<pre>npx expo install expo-local-authentication</pre>
 
-## ⚙️ Como rodar esta Demo localmente
+<h2>🚀 Como Executar o Projeto</h2>
 
-### Pré-requisitos
-Certifique-se de ter instalado em sua máquina:
-* [Node.js](https://nodejs.org/)
-* [Git](https://git-scm.com/)
-* Ambiente Expo / React Native configurado.
+<pre>
+git clone https://github.com/jezielmonteiro/CLA.git
+cd CLA
+npm install
+npx expo start --tunnel
+</pre>
 
-### Passo a Passo
+<h2>⚙️ Permissões Necessárias</h2>
 
-1. **Clone este repositório Beta**
-   ```bash
-   git clone [https://github.com/Luann8/CLA-Beta.git](https://github.com/Luann8/CLA-Beta.git)
+<ul>
+    <li>📷 Acesso à câmera</li>
+    <li>👆 Autenticação biométrica</li>
+</ul>
+
+<h2>📌 Status do Projeto</h2>
+<p>🚧 Em desenvolvimento</p>
