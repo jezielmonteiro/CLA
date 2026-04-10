@@ -43,6 +43,7 @@ npx expo install expo-local-authentication
 
  <h2>🚀 Como Executar o Projeto</h2>
         <pre>
+                
 # Clone o repositório
 git clone https://github.com/jezielmonteiro/CLA.git
 
