@@ -1,14 +1,4 @@
-Aqui está a versão 100% em HTML puro, sem nenhum CSS externo ou interno (sem <style>), usando apenas tags HTML básicas e emojis:
-HTML<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CLA - Controle de Licenças Ambientais</title>
-</head>
-<body>
-
-  <h1>🌎 Controle de Licenças Ambientais (CLA)</h1>
+<h1>🌎 Controle de Licenças Ambientais (CLA)</h1>
 
   <p>Aplicativo desenvolvido com o objetivo de gerenciar e acompanhar licenças ambientais de forma prática e eficiente.</p>
     <p>Este projeto foi criado como parte da disciplina <strong>Laboratório de Desenvolvimento de Aplicativos Híbridos</strong>.</p>
@@ -38,6 +28,7 @@ HTML<!DOCTYPE html>
 
   <h2>📦 Dependências Extras</h2>
     <pre>
+        
 # Câmera
 npx expo install expo-camera
 
