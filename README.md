@@ -66,5 +66,9 @@ npx expo start --tunnel
     <li>👆 Autenticação biométrica</li>
 </ul>
 
+  <li><a href="https://github.com/jezielmonteiro" target="_blank">Jeziel Luiz Monteiro Farani</a></li>
+    <li><a href="https://github.com/Luann8" target="_blank">Luann Pereira Mendes</a></li>
+    <li><a href="https://github.com/LuizinSouza" target="_blank">Luiz Henrique Souza Nascimento</a></li>
+
 <h2>📌 Status do Projeto</h2>
 <p>🚧 Em desenvolvimento</p>
