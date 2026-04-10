@@ -29,10 +29,11 @@
 
 <h2>📦 Dependências Extras</h2>
 <pre>
-# Câmera
+
+## Câmera
 npx expo install expo-camera
 
-# Autenticação biométrica
+## Autenticação biométrica
 npx expo install expo-local-authentication
         </pre>
 
@@ -44,16 +45,16 @@ npx expo install expo-local-authentication
  <h2>🚀 Como Executar o Projeto</h2>
         <pre>
                 
-# Clone o repositório
+## Clone o repositório
 git clone https://github.com/jezielmonteiro/CLA.git
 
-# Acesse a pasta do projeto
+## Acesse a pasta do projeto
 cd CLA
 
-# Instale as dependências
+## Instale as dependências
 npm install
 
-# Execute o projeto
+## Execute o projeto
 npx expo start --tunnel
         </pre>
 
