@@ -2,7 +2,7 @@
 
   <h1>🌎 Controle de Licenças Ambientais (CLA)</h1>
 
-  <p>Aplicativo para gerenciamento e acompanhamento de licenças ambientais</p>
+  <p>Aplicativo para gerenciamento e acompanhamento de licenças ambientais.</p>
 
   <!-- Badges -->
   <p>
@@ -29,6 +29,7 @@
     <li>🗑️ Remoção de dados cadastrados</li>
     <li>📷 Captura de imagens para anexar às licenças</li>
     <li>👆 Autenticação por biometria (impressão digital)</li>
+    <li>🗺️ Seleção de localização para anexar às licenças</li>
 </ul>
 
 <p>O sistema busca facilitar a organização e o acompanhamento de processos ambientais, contribuindo para maior controle e conformidade.</p>
@@ -40,6 +41,7 @@
     <li>JavaScript</li>
     <li>Expo Camera</li>
     <li>Expo Local Authentication (biometria)</li>
+    <li>Expo Location</li>
 </ul>
 
 <h2>📦 Dependências Extras</h2>
@@ -47,8 +49,11 @@
 <h2>Câmera</h2>
 <pre>npx expo install expo-camera</pre>
 
-<h2>Autenticação biométrica (impressão digital)</h2>
+<h2>Autenticação Biométrica (impressão digital)</h2>
 <pre>npx expo install expo-local-authentication</pre>
+
+<h2>Localização</h2>
+<pre>npx expo install expo-location</pre>
 
 <h2>🚀 Como Executar o Projeto</h2>
 
@@ -64,9 +69,10 @@ npx expo start --tunnel
 <ul>
     <li>📷 Acesso à câmera</li>
     <li>👆 Autenticação biométrica</li>
+    <li>🗺️ Acesso à localização</li>
 </ul>
 
-<h2>🧑‍💻 Alunos/devs</h2>
+<h2>🧑‍💻 Alunos</h2>
 
 <ul>
     <li><a href="https://github.com/jezielmonteiro" target="_blank">Jeziel Luiz Monteiro Farani</a></li>
