@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
+// ADICIONADO: Alert para o logout e Text para a lista vazia
+import { View, FlatList, StyleSheet, Alert, Text } from 'react-native'; 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Header } from '../components/Header';
@@ -15,14 +16,21 @@ export const MainScreen = ({ licencas, onEdit, onDelete, onLogout, onAddPress, o
   const handleLogout = () => {
     Alert.alert('Sair', 'Deseja realmente sair do aplicativo?', [
       { text: 'Cancelar', style: 'cancel' },
-      { text: 'Sair', style: 'destructive', onPress: async () => { await deletePassword(); onLogout(); } }
+      { 
+        text: 'Sair', 
+        style: 'destructive', 
+        onPress: async () => { 
+          await deletePassword(); 
+          onLogout(); 
+        } 
+      }
     ]);
   };
 
   if (activeTab === 'stats') {
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="dark-content" />
+        <StatusBar style="dark" />
         <Header onLogout={handleLogout} />
         <StatsScreen licencas={licencas} insets={insets} />
         <BottomTabBar activeTab={activeTab} onTabChange={setActiveTab} onAddPress={onAddPress} insets={insets} />
@@ -32,7 +40,7 @@ export const MainScreen = ({ licencas, onEdit, onDelete, onLogout, onAddPress, o
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar style="light" />
       <Header onLogout={handleLogout} />
       <FlatList
         data={licencas}
