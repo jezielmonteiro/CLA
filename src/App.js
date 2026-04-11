@@ -92,17 +92,21 @@ export default function App() {
   }
 
   if (currentScreen === 'map') {
-    return (
-      <SafeAreaProvider>
-        <MapScreen
-          onConfirm={(location) => {
-            setSelectedLocation(location);
-            setCurrentScreen('form');
-          }}
-          onCancel={() => setCurrentScreen('form')}
-          initialLocation={editingItem ? { latitude: editingItem.latitude, longitude: editingItem.longitude } : null}
-        />
-      </SafeAreaProvider>
+      return (
+        <SafeAreaProvider>
+          <MapScreen
+            onConfirm={(location) => {
+              setSelectedLocation(location); // Salva o local
+              setCurrentScreen('form');      // Vai para o formulário
+            }}
+            onCancel={() => {
+            // MUDANÇA AQUI: Se cancelar o mapa ANTES de criar a licença,
+            // ele deve voltar para a tela inicial (main), não para o form.
+              setCurrentScreen('main'); 
+            }}
+            initialLocation={editingItem ? { latitude: editingItem.latitude, longitude: editingItem.longitude } : null}
+          />
+        </SafeAreaProvider>
     );
   }
 
@@ -150,7 +154,7 @@ export default function App() {
         onAddPress={() => {
           setEditingItem(null);
           setSelectedLocation(null);
-          setCurrentScreen('form');
+          setCurrentScreen('map');
         }}
         onViewDetail={(item) => {
           setSelectedItem(item);
