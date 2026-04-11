@@ -1,22 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Image, Alert, StyleSheet } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { formatarData, validarData } from '../utils/dateUtils';
 
-export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, selectedLocation, setSelectedLocation }) => {
+export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, selectedLocation, setSelectedLocation, tempData }) => {
   const insets = useSafeAreaInsets();
-  const [projeto, setProjeto] = useState(item?.projeto || '');
-  const [nome, setNome] = useState(item?.nome || '');
-  const [validade, setValidade] = useState(item?.validade || '');
-  const [fotoUri, setFotoUri] = useState(item?.fotoUri || null);
+  
+  
+  const [projeto, setProjeto] = useState(tempData?.projeto || item?.projeto || '');
+  const [nome, setNome] = useState(tempData?.nome || item?.nome || '');
+  const [validade, setValidade] = useState(tempData?.validade || item?.validade || '');
+  
+  
+  const [fotoUri, setFotoUri] = useState(tempData?.fotoUri || item?.fotoUri || null);
+
+
+  useEffect(() => {
+    if (tempData?.fotoUri) {
+      setFotoUri(tempData.fotoUri);
+    }
+  }, [tempData?.fotoUri]);
 
   const salvar = () => {
     if (!projeto.trim()) { Alert.alert('Erro', 'Projeto é obrigatório'); return; }
     if (!validade.trim()) { Alert.alert('Erro', 'Validade é obrigatória'); return; }
     if (!validarData(validade)) { Alert.alert('Erro', 'Data inválida. Use dd/mm/aaaa'); return; }
     onSave({ projeto, nome, validade, fotoUri });
+  };
+
+  
+  const prepararSaida = (acao) => {
+    const dadosAtuais = { projeto, nome, validade, fotoUri };
+    acao(dadosAtuais);
   };
 
   return (
@@ -57,12 +74,14 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
           />
           
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.mapButton} onPress={onOpenMap}>
+            {/* Agora envia os dados atuais para o App.js antes de abrir o mapa */}
+            <TouchableOpacity style={styles.mapButton} onPress={() => prepararSaida(onOpenMap)}>
               <Icon name="map" size={20} color="#4338ca" />
               <Text style={styles.mapButtonText}>Localização</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.cameraButton} onPress={onOpenCamera}>
+            {/* Agora envia os dados atuais para o App.js antes de abrir a câmera */}
+            <TouchableOpacity style={styles.cameraButton} onPress={() => prepararSaida(onOpenCamera)}>
               <Icon name="camera-alt" size={20} color="#296959" />
               <Text style={styles.cameraButtonText}>Foto</Text>
             </TouchableOpacity>

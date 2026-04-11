@@ -19,6 +19,9 @@ export default function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   
+  // NOVO: Estado para segurar os dados do formulário enquanto tira foto ou vê mapa
+  const [tempFormData, setTempFormData] = useState(null);
+  
   const { licencas, isLoading, loadData, adicionarOuEditar, excluir } = useLicenses(initialLicencas);
   const { getLocationPermission } = useLocation();
 
@@ -49,6 +52,7 @@ export default function App() {
       setCurrentScreen('main');
       setEditingItem(null);
       setSelectedLocation(null);
+      setTempFormData(null); // Limpa os temporários após salvar
     }
   };
 
@@ -56,7 +60,8 @@ export default function App() {
     if (editingItem) {
       handleSave({ ...editingItem, fotoUri: uri });
     } else {
-      setEditingItem({ fotoUri: uri });
+      // Mescla a foto com os dados que já haviam sido digitados no form
+      setTempFormData(prev => ({ ...prev, fotoUri: uri }));
       setCurrentScreen('form');
     }
   };
@@ -96,12 +101,10 @@ export default function App() {
         <SafeAreaProvider>
           <MapScreen
             onConfirm={(location) => {
-              setSelectedLocation(location); // Salva o local
-              setCurrentScreen('form');      // Vai para o formulário
+              setSelectedLocation(location);
+              setCurrentScreen('form');      
             }}
             onCancel={() => {
-            // MUDANÇA AQUI: Se cancelar o mapa ANTES de criar a licença,
-            // ele deve voltar para a tela inicial (main), não para o form.
               setCurrentScreen('main'); 
             }}
             initialLocation={editingItem ? { latitude: editingItem.latitude, longitude: editingItem.longitude } : null}
@@ -115,14 +118,24 @@ export default function App() {
       <SafeAreaProvider>
         <FormScreen
           item={editingItem}
+          tempData={tempFormData} 
           onSave={handleSave}
           onCancel={() => {
             setCurrentScreen('main');
             setEditingItem(null);
             setSelectedLocation(null);
+            setTempFormData(null); // Limpa tudo ao cancelar
           }}
-          onOpenCamera={() => setCurrentScreen('camera')}
-          onOpenMap={() => setCurrentScreen('map')}
+          
+          onOpenCamera={(dadosAtuais) => {
+            setTempFormData(dadosAtuais);
+            setCurrentScreen('camera');
+          }}
+          
+          onOpenMap={(dadosAtuais) => {
+            setTempFormData(dadosAtuais);
+            setCurrentScreen('map');
+          }}
           selectedLocation={selectedLocation}
           setSelectedLocation={setSelectedLocation}
         />
@@ -154,6 +167,7 @@ export default function App() {
         onAddPress={() => {
           setEditingItem(null);
           setSelectedLocation(null);
+          setTempFormData(null); // Garante que o form comece limpo
           setCurrentScreen('map');
         }}
         onViewDetail={(item) => {
