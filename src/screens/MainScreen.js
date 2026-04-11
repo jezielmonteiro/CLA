@@ -14,7 +14,7 @@ export const MainScreen = ({ licencas, onEdit, onDelete, onLogout, onAddPress, o
   const [activeTab, setActiveTab] = useState('home');
 
   const handleLogout = () => {
-    Alert.alert('Sair', 'Deseja realmente sair do aplicativo?', [
+    Alert.alert('Sair', 'Deseja realmente sair de sua conta?', [
       { text: 'Cancelar', style: 'cancel' },
       { 
         text: 'Sair', 

@@ -49,7 +49,7 @@ export const MapScreen = ({ onConfirm, onCancel }) => {
 
       {/* Botão de GPS escrito em Texto para não dar erro de ícone */}
       <TouchableOpacity style={styles.gpsButton} onPress={buscarMinhaPosicao}>
-        <Text style={{ fontWeight: 'bold', color: '#296959' }}>ONDE ESTOU?</Text>
+        <Text style={{ fontWeight: 'bold', color: '#296959' }}>Onde estou?</Text>
       </TouchableOpacity>
 
       <View style={styles.buttonsContainer}>
@@ -57,11 +57,11 @@ export const MapScreen = ({ onConfirm, onCancel }) => {
           style={styles.confirmButton} 
           onPress={() => selectedLocation ? onConfirm(selectedLocation) : Alert.alert('Aviso', 'Selecione um ponto no mapa')}
         >
-          <Text style={styles.buttonText}>CONFIRMAR LOCAL</Text>
+          <Text style={styles.buttonText}>Confirmar</Text>
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-          <Text style={styles.buttonText}>VOLTAR</Text>
+          <Text style={styles.buttonText}>Voltar</Text>
         </TouchableOpacity>
       </View>
     </View>

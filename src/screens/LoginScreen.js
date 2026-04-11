@@ -41,7 +41,7 @@ export const LoginScreen = ({ onLoginSuccess }) => {
           />
         </View>
       </View>
-      <Text style={styles.title}>Bem-vindo</Text>
+      <Text style={styles.title}>Bem-vindo(a)!</Text>
       <Text style={styles.subtitle}>Controle de Licenças Ambientais</Text>
       
       <TextInput

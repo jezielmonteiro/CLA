@@ -43,7 +43,7 @@ export const DetailScreen = ({ item, onBack }) => {
           
           {item.latitude && item.longitude && (
             <View style={styles.mapContainer}>
-              <Text style={styles.mapTitle}>Localização</Text>
+              <Text style={styles.mapTitle}>Localização:</Text>
               <MapView
                 style={styles.map}
                 initialRegion={{
