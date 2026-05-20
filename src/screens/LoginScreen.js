@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, Image, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -9,6 +10,7 @@ import { DEFAULT_PASSWORD } from '../utils/constants';
 export const LoginScreen = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [showBioOption, setShowBioOption] = useState(false);
   const { isBiometricCompatible, isAuthenticating, authenticateBiometry } = useBiometric();
 
   const fazerLogin = async () => {
@@ -20,14 +22,65 @@ export const LoginScreen = ({ onLoginSuccess }) => {
       Alert.alert('Erro', 'Senha incorreta\nTeste: 123456');
       return;
     }
+
     try {
-      await savePassword(senha);
-      const success = await authenticateBiometry();
-      if (success) onLoginSuccess();
+      const isBioConfigured = await AsyncStorage.getItem('@biometrics_configured');
+
+      if (isBioConfigured !== null) {
+        const userAcceptedBio = await AsyncStorage.getItem('@use_registered_biometrics');
+        const useBio = userAcceptedBio === 'true';
+
+        await finalizarLogin(useBio);
+      } else if (isBiometricCompatible) {
+        setShowBioOption(true);
+      } else {
+        await finalizarLogin(false);
+      }
     } catch (error) {
-      Alert.alert('Erro', 'Falha ao realizar login');
+      Alert.alert('Error', 'Falha ao verificar os dados de login');
     }
   };
+
+  const finalizarLogin = async (useBiometric = false) => {
+    try {
+      await savePassword(senha);
+
+      await AsyncStorage.setItem('@biometrics_configured', 'true');
+      await AsyncStorage.setItem('@use_registered_biometrics', useBiometric ? 'true' : 'false');
+
+      if (useBiometric) {
+        const success = await authenticateBiometry();
+        if (success) onLoginSuccess();
+      } else {
+        onLoginSuccess();
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Falha ao realizar o login');
+    }
+  };
+
+  if (showBioOption) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Impressão Digital</Text>
+        <Text style={styles.subtitle}>Deseja habilitar a autenticação por biometria?</Text>
+
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={() => finalizarLogin(true)}
+        >
+          <Text style={styles.buttonText}>Sim</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.buttonSkip} 
+          onPress={() => finalizarLogin(false)}
+        >
+          <Text style={styles.buttonTextSkip}>Não</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -63,12 +116,6 @@ export const LoginScreen = ({ onLoginSuccess }) => {
         secureTextEntry
       />
       
-      {isBiometricCompatible !== null && (
-        <Text style={styles.bioText}>
-          {isBiometricCompatible ? '🔐 Biometria disponível' : '📱 Biometria não disponível'}
-        </Text>
-      )}
-      
       {isAuthenticating ? (
         <ActivityIndicator size="large" color="#10b981" style={{ marginTop: 24 }} />
       ) : (
@@ -83,27 +130,14 @@ export const LoginScreen = ({ onLoginSuccess }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8fafc', padding: 24, justifyContent: 'center' },
   logoContainer: { alignItems: 'center', marginBottom: 40 },
-  logoCircle: { 
-    width: 120, 
-    height: 120, 
-    borderRadius: 60, 
-    backgroundColor: '#296959', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    shadowColor: '#296959', 
-    shadowOffset: { width: 0, height: 4 }, 
-    shadowOpacity: 0.3, 
-    shadowRadius: 8, 
-    elevation: 5 
-  },
-  logoImage: { 
-    width: 80, 
-    height: 80,
-  },
+  logoCircle: { width: 120, height: 120, borderRadius: 60, backgroundColor: '#296959', justifyContent: 'center', alignItems: 'center', shadowColor: '#296959', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+  logoImage: { width: 80, height: 80},
   title: { fontSize: 32, fontWeight: 'bold', color: '#296959', textAlign: 'center', marginBottom: 8 },
   subtitle: { fontSize: 16, color: '#111827', textAlign: 'center', marginBottom: 48 },
   input: { backgroundColor: 'white', borderRadius: 16, padding: 16, fontSize: 16, marginBottom: 16, borderWidth: 1, borderColor: '#e5e7eb', color: '#111827' },
   button: { backgroundColor: '#296959', padding: 18, borderRadius: 16, alignItems: 'center', marginTop: 24, shadowColor: '#10b981', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
   buttonText: { color: 'white', fontSize: 18, fontWeight: '600' },
   bioText: { textAlign: 'center', marginTop: 20, color: '#6b7280', fontSize: 14 },
+  buttonSkip: { padding: 18, marginTop: 10, alignItems: 'center' },
+  buttonTextSkip: { color: '#6b7280', fontSize: 16, fontWeight: '500' },
 });
