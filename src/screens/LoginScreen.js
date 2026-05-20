@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, Image, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, Image, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useBiometric } from '../hooks/useBiometric';
@@ -85,6 +85,15 @@ export const LoginScreen = ({ onLoginSuccess }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}
+          >
       <View style={styles.logoContainer}>
         <View style={styles.logoCircle}>
           <Image 
@@ -123,12 +132,16 @@ export const LoginScreen = ({ onLoginSuccess }) => {
           <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
       )}
+      </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc', padding: 24, justifyContent: 'center' },
+  container: { flex: 1, backgroundColor: '#f8fafc'}, justifyContent: 'center', 
+  scrollContainer: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 24},
   logoContainer: { alignItems: 'center', marginBottom: 40 },
   logoCircle: { width: 120, height: 120, borderRadius: 60, backgroundColor: '#296959', justifyContent: 'center', alignItems: 'center', shadowColor: '#296959', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
   logoImage: { width: 80, height: 80},
