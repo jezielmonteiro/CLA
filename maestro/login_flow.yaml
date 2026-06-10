@@ -1,0 +1,30 @@
+appId: host.exp.exponent
+---
+- clearState
+- launchApp
+# Caso os termos de uso estejam visíveis (primeira execução), aceitamos eles
+- runFlow:
+    when:
+      visible: "Li e Concordo"
+    commands:
+      - tapOn: "Li e Concordo"
+
+# Preenche credenciais de e-mail e senha
+- tapOn: "Seu endereço de e-mail"
+- inputText: "test@cla.com"
+- tapOn: "Sua senha secreta"
+- inputText: "password123"
+- hideKeyboard
+
+# Clica no botão Entrar
+- tapOn: "Entrar"
+
+# Se o dispositivo for compatível com biometria e exibir a pergunta de configuração
+- runFlow:
+    when:
+      visible: "Pular por enquanto"
+    commands:
+      - tapOn: "Pular por enquanto"
+
+# Verifica se chegamos na tela principal
+- assertVisible: "Controle de Licenças Ambientais"

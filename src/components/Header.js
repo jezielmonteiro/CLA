@@ -13,7 +13,7 @@ export const Header = ({ onLogout }) => {
           <Text style={styles.headerSubtitle}>Controle de Licenças Ambientais</Text>
         </View>
 
-        <TouchableOpacity onPress={onLogout} style={styles.logoutButton}>
+        <TouchableOpacity onPress={onLogout} style={styles.logoutButton} testID="logout-button">
           <Icon name="logout" size={24} color="white" />
         </TouchableOpacity>
       </View>

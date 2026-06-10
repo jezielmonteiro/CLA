@@ -1,0 +1,5 @@
+appId: host.exp.exponent
+---
+# Para rodar com um build nativo do Expo (development build ou release build)
+# Substitua o appId acima pelo package name/bundle identifier do seu app:
+# appId: com.seuusuario.cla

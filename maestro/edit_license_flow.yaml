@@ -1,0 +1,26 @@
+appId: host.exp.exponent
+---
+# Assumimos que estamos na tela principal com a lista de licenças
+- assertVisible: "Projeto E2E Maestro"
+
+# Desliza a licença para a esquerda para revelar os botões de ação (Editar e Excluir)
+- swipe:
+    direction: LEFT
+    element: "Projeto E2E Maestro"
+
+# Clica no botão de Editar
+- tapOn: "Editar"
+
+# Agora na tela de formulário, vamos editar a empresa responsável
+- tapOn: "Empresa / Responsável"
+# Apaga o texto anterior e escreve o novo
+- clearText
+- inputText: "EcoGlow Editada"
+
+- hideKeyboard
+
+# Clica em Salvar
+- tapOn: "Salvar"
+
+# Verifica se a informação editada aparece no card correspondente na lista
+- assertVisible: "EcoGlow Editada"

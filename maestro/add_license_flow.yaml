@@ -1,0 +1,51 @@
+appId: host.exp.exponent
+---
+# Assumimos que o login já foi feito e estamos na tela principal
+- assertVisible: "Controle de Licenças Ambientais"
+
+# Toca no botão de adicionar na barra inferior
+- tapOn: "Adicionar"
+
+# Chega na tela de Mapa. Marcamos 3 pontos para criar um polígono de área
+- tapOn:
+    x: 50%
+    y: 40%
+- tapOn:
+    x: 40%
+    y: 50%
+- tapOn:
+    x: 60%
+    y: 50%
+
+# Confirma a área selecionada
+- tapOn: "Confirmar Área"
+
+# Agora estamos na tela de formulário. Preenchemos os campos
+- tapOn: "Nome do Projeto *"
+- inputText: "Projeto E2E Maestro"
+
+- tapOn: "Órgão Emissor / Descrição"
+- inputText: "IBAMA"
+
+- tapOn: "Número da Licença"
+- inputText: "12345/2026"
+
+- tapOn: "Tipo de Licença (ex: LP, LI, LO)"
+- inputText: "LO"
+
+- tapOn: "Data de Emissão (dd/mm/aaaa)"
+- inputText: "01012026"
+
+- tapOn: "Empresa / Responsável"
+- inputText: "Maestro Tests Corp"
+
+- tapOn: "Data de Validade (dd/mm/aaaa) *"
+- inputText: "01012028"
+
+- hideKeyboard
+
+# Clica em Salvar
+- tapOn: "Salvar"
+
+# Verifica se o card criado com o nome do projeto está visível na lista
+- assertVisible: "Projeto E2E Maestro"

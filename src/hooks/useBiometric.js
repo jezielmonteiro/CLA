@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import * as LocalAuthentication from 'expo-local-authentication';
+import { useState, useEffect } from "react";
+import * as LocalAuthentication from "expo-local-authentication";
 
 export const useBiometric = () => {
   const [isBiometricCompatible, setIsBiometricCompatible] = useState(null);
@@ -15,7 +15,7 @@ export const useBiometric = () => {
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
       setIsBiometricCompatible(hasHardware && isEnrolled);
     } catch (err) {
-      console.error('Erro ao verificar biometria:', err);
+      console.error("Erro ao verificar biometria:", err);
       setIsBiometricCompatible(false);
     }
   };
@@ -25,13 +25,13 @@ export const useBiometric = () => {
     setIsAuthenticating(true);
     try {
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Autentique para acessar o CLA',
-        fallbackLabel: 'Usar senha',
+        promptMessage: "Autentique para acessar o CLA",
+        fallbackLabel: "Usar senha",
         disableDeviceFallback: false,
       });
       return result.success;
     } catch (err) {
-      console.error('Erro na biometria:', err);
+      console.error("Erro na biometria:", err);
       return false;
     } finally {
       setIsAuthenticating(false);
