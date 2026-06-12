@@ -32,18 +32,12 @@ export const CameraScreen = ({ onCapture, onCancel }) => {
     if (isTaking || !cameraRef.current) return;
     setIsTaking(true);
     try {
-<<<<<<< HEAD
-      const photo = await cameraRef.current.takePictureAsync({ quality: 0.7 });
-      onCapture(photo.uri);
-=======
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.3,
         base64: true,
         exif: false,
       });
-      // Passa tanto a URI quanto o base64 para evitar problemas de upload
       onCapture(photo.uri, photo.base64);
->>>>>>> feat/api-jwt-security
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível tirar a foto');
     } finally {
@@ -54,30 +48,16 @@ export const CameraScreen = ({ onCapture, onCancel }) => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-<<<<<<< HEAD
-      <CameraView ref={cameraRef} style={styles.camera} facing="back">
-        <View style={styles.overlay}>
-          <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-            <Icon name="close" size={30} color="white" />
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.captureButton} onPress={tirarFoto} disabled={isTaking}>
-            <View style={styles.captureInner} />
-          </TouchableOpacity>
-        </View>
-      </CameraView>
-=======
       <CameraView ref={cameraRef} style={styles.camera} facing="back" />
       <View style={styles.overlay}>
         <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
           <Icon name="close" size={30} color="white" />
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.captureButton} onPress={tirarFoto} disabled={isTaking}>
           <View style={styles.captureInner} />
         </TouchableOpacity>
       </View>
->>>>>>> feat/api-jwt-security
     </View>
   );
 };
@@ -85,11 +65,7 @@ export const CameraScreen = ({ onCapture, onCancel }) => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   camera: { flex: 1 },
-<<<<<<< HEAD
-  overlay: { flex: 1, justifyContent: 'space-between', alignItems: 'center', paddingVertical: 50 },
-=======
   overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'space-between', alignItems: 'center', paddingVertical: 50, zIndex: 10 },
->>>>>>> feat/api-jwt-security
   cancelButton: { width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-start', marginLeft: 20 },
   captureButton: { width: 70, height: 70, borderRadius: 35, backgroundColor: 'rgba(255,255,255,0.3)', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
   captureInner: { width: 60, height: 60, borderRadius: 30, backgroundColor: 'white', borderWidth: 2, borderColor: '#10b981' },

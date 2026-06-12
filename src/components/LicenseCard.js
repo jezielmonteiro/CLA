@@ -1,61 +1,3 @@
-<<<<<<< HEAD
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-
-export const LicenseCard = ({ item, onPress, onEdit, onDelete }) => (
-  <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={onPress}>
-    {item.fotoUri && <Image source={{ uri: item.fotoUri }} style={styles.cardImage} />}
-    <View style={styles.cardContent}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle} numberOfLines={1}>{item.projeto}</Text>
-        <View style={[styles.statusBadge, { backgroundColor: item.cor }]}>
-          <Text style={styles.statusBadgeText}>{item.sigla}</Text>
-        </View>
-      </View>
-      <Text style={styles.cardSubtitle} numberOfLines={1}>{item.nome}</Text>
-      <View style={styles.cardDateContainer}>
-        <Icon name="event" size={14} color="#9ca3af" />
-        <Text style={styles.cardDate}> Validade: {item.validade}</Text>
-      </View>
-      <Text style={[styles.cardStatus, { color: item.cor }]}>{item.status}</Text>
-    </View>
-    <View style={styles.cardActions}>
-      <TouchableOpacity onPress={onEdit} style={styles.actionButton}>
-        <Icon name="edit" size={20} color="#3b82f6" />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={onDelete} style={styles.actionButton}>
-        <Icon name="delete" size={20} color="#ef4444" />
-      </TouchableOpacity>
-    </View>
-  </TouchableOpacity>
-);
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    marginBottom: 16,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  cardImage: { width: '100%', height: 160, borderRadius: 16, marginBottom: 12 },
-  cardContent: { flex: 1 },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  cardTitle: { fontSize: 18, fontWeight: '700', color: '#111827', flex: 1, marginRight: 12 },
-  statusBadge: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20 },
-  statusBadgeText: { color: 'white', fontWeight: 'bold', fontSize: 11 },
-  cardSubtitle: { fontSize: 14, color: '#6b7280', marginBottom: 8 },
-  cardDateContainer: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
-  cardDate: { fontSize: 13, color: '#9ca3af', marginLeft: 4 },
-  cardStatus: { fontSize: 14, fontWeight: '600', marginTop: 8 },
-  cardActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 12, borderTopWidth: 1, borderTopColor: '#f3f4f6', paddingTop: 12 },
-  actionButton: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center' },
-=======
 import React, { useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -81,8 +23,8 @@ export const LicenseCard = ({ item, onPress, onEdit, onDelete }) => {
     return (
       <View style={styles.actionsContainer}>
         <Animated.View style={{ transform: [{ scale: scaleEdit }] }}>
-          <TouchableOpacity 
-            style={[styles.swipeActionButton, { backgroundColor: '#3b82f6' }]} 
+          <TouchableOpacity
+            style={[styles.swipeActionButton, { backgroundColor: '#3b82f6' }]}
             onPress={() => {
               swipeableRef.current?.close();
               onEdit();
@@ -93,8 +35,8 @@ export const LicenseCard = ({ item, onPress, onEdit, onDelete }) => {
           </TouchableOpacity>
         </Animated.View>
         <Animated.View style={{ transform: [{ scale: scaleDelete }] }}>
-          <TouchableOpacity 
-            style={[styles.swipeActionButton, { backgroundColor: '#ef4444' }]} 
+          <TouchableOpacity
+            style={[styles.swipeActionButton, { backgroundColor: '#ef4444' }]}
             onPress={() => {
               swipeableRef.current?.close();
               onDelete();
@@ -125,7 +67,7 @@ export const LicenseCard = ({ item, onPress, onEdit, onDelete }) => {
             <Text style={styles.placeholderText}>Sem foto</Text>
           </View>
         )}
-        
+
         <View style={styles.cardContent}>
           <View style={styles.headerRow}>
             <View style={styles.titleContainer}>
@@ -195,9 +137,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#f1f5f9',
   },
-  cardImage: { 
-    width: '100%', 
-    height: 180, 
+  cardImage: {
+    width: '100%',
+    height: 180,
     resizeMode: 'cover',
   },
   placeholderImage: {
@@ -215,35 +157,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
-  cardContent: { 
+  cardContent: {
     padding: 20,
   },
-  headerRow: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
   titleContainer: {
     flex: 1,
     marginRight: 12,
   },
-  cardTitle: { 
-    fontSize: 20, 
-    fontWeight: '800', 
-    color: '#0f172a', 
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#0f172a',
     marginBottom: 4,
     letterSpacing: -0.5,
   },
-  cardSubtitle: { 
-    fontSize: 14, 
-    color: '#64748b', 
+  cardSubtitle: {
+    fontSize: 14,
+    color: '#64748b',
     fontWeight: '500',
   },
-  statusBadge: { 
+  statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12, 
-    paddingVertical: 6, 
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 20,
   },
   statusDot: {
@@ -252,8 +194,8 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginRight: 6,
   },
-  statusBadgeText: { 
-    fontWeight: '700', 
+  statusBadgeText: {
+    fontWeight: '700',
     fontSize: 12,
     letterSpacing: 0.5,
   },
@@ -305,5 +247,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginTop: 6,
   },
->>>>>>> feat/api-jwt-security
 });

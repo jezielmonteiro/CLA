@@ -1,23 +1,19 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { MaterialIcons as Icon } from '@expo/vector-icons'; 
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { MaterialIcons as Icon } from '@expo/vector-icons';
 
 export const Header = ({ onLogout }) => {
   return (
     <View style={styles.header}>
       <View style={styles.headerContent}>
         <Icon name="eco" size={28} color="white" />
-        
+
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>CLA</Text>
           <Text style={styles.headerSubtitle}>Controle de Licenças Ambientais</Text>
         </View>
 
-<<<<<<< HEAD
-        <TouchableOpacity onPress={onLogout} style={styles.logoutButton}>
-=======
         <TouchableOpacity onPress={onLogout} style={styles.logoutButton} testID="logout-button">
->>>>>>> feat/api-jwt-security
           <Icon name="logout" size={24} color="white" />
         </TouchableOpacity>
       </View>
@@ -35,7 +31,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    elevation: 5, // Adicionado para aparecer sombra no Android também
+    elevation: 5,
   },
   headerContent: {
     flexDirection: 'row',

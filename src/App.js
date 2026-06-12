@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-<<<<<<< HEAD
-import { licenca as initialLicencas } from '../licencas';
-=======
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
->>>>>>> feat/api-jwt-security
 import { useLicenses } from './hooks/useLicenses';
 import { useLocation } from './hooks/useLocation';
 import { getPassword } from './services/auth';
@@ -18,8 +14,6 @@ import { MapScreen } from './screens/MapScreen';
 import { DetailScreen } from './screens/DetailScreen';
 
 export default function App() {
-<<<<<<< HEAD
-=======
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AppContent />
@@ -28,21 +22,16 @@ export default function App() {
 }
 
 function AppContent() {
->>>>>>> feat/api-jwt-security
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentScreen, setCurrentScreen] = useState('login');
   const [editingItem, setEditingItem] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
-  
-  // NOVO: Estado para segurar os dados do formulário enquanto tira foto ou vê mapa
+
+  // Estado para segurar os dados do formulário enquanto tira foto ou vê mapa
   const [tempFormData, setTempFormData] = useState(null);
-  
-<<<<<<< HEAD
-  const { licencas, isLoading, loadData, adicionarOuEditar, excluir } = useLicenses(initialLicencas);
-=======
+
   const { licencas, isLoading, loadData, adicionarOuEditar, excluir } = useLicenses();
->>>>>>> feat/api-jwt-security
   const { getLocationPermission } = useLocation();
 
   useEffect(() => {
@@ -72,25 +61,15 @@ function AppContent() {
       setCurrentScreen('main');
       setEditingItem(null);
       setSelectedLocation(null);
-      setTempFormData(null); // Limpa os temporários após salvar
+      setTempFormData(null);
     }
   };
 
-<<<<<<< HEAD
-  const handleCameraCapture = (uri) => {
-    if (editingItem) {
-      handleSave({ ...editingItem, fotoUri: uri });
-    } else {
-      // Mescla a foto com os dados que já haviam sido digitados no form
-      setTempFormData(prev => ({ ...prev, fotoUri: uri }));
-=======
   const handleCameraCapture = (uri, base64) => {
     if (editingItem) {
       handleSave({ ...editingItem, fotoUri: uri, fotoBase64: base64 });
     } else {
-      // Mescla a foto com os dados que já haviam sido digitados no form
       setTempFormData(prev => ({ ...prev, fotoUri: uri, fotoBase64: base64 }));
->>>>>>> feat/api-jwt-security
       setCurrentScreen('form');
     }
   };
@@ -99,7 +78,7 @@ function AppContent() {
     return (
       <SafeAreaProvider>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#10b981" />
+          <ActivityIndicator size="large" color="#296959" />
           <Text style={styles.loadingText}>Carregando...</Text>
         </View>
       </SafeAreaProvider>
@@ -126,23 +105,23 @@ function AppContent() {
   }
 
   if (currentScreen === 'map') {
-      return (
-        <SafeAreaProvider>
-          <MapScreen
-            onConfirm={(location) => {
-              setSelectedLocation(location);
-              setCurrentScreen('form');      
-            }}
-            onCancel={() => {
-              setCurrentScreen('main'); 
-            }}
-<<<<<<< HEAD
-            initialLocation={editingItem ? { latitude: editingItem.latitude, longitude: editingItem.longitude } : null}
-=======
-            initialLocation={editingItem ? (editingItem.coordinates || (editingItem.latitude ? [{latitude: editingItem.latitude, longitude: editingItem.longitude}] : [])) : null}
->>>>>>> feat/api-jwt-security
-          />
-        </SafeAreaProvider>
+    return (
+      <SafeAreaProvider>
+        <MapScreen
+          onConfirm={(location) => {
+            setSelectedLocation(location);
+            setCurrentScreen('form');
+          }}
+          onCancel={() => {
+            setCurrentScreen('main');
+          }}
+          initialLocation={
+            editingItem
+              ? (editingItem.coordinates || (editingItem.latitude ? [{ latitude: editingItem.latitude, longitude: editingItem.longitude }] : []))
+              : null
+          }
+        />
+      </SafeAreaProvider>
     );
   }
 
@@ -151,20 +130,18 @@ function AppContent() {
       <SafeAreaProvider>
         <FormScreen
           item={editingItem}
-          tempData={tempFormData} 
+          tempData={tempFormData}
           onSave={handleSave}
           onCancel={() => {
             setCurrentScreen('main');
             setEditingItem(null);
             setSelectedLocation(null);
-            setTempFormData(null); // Limpa tudo ao cancelar
+            setTempFormData(null);
           }}
-          
           onOpenCamera={(dadosAtuais) => {
             setTempFormData(dadosAtuais);
             setCurrentScreen('camera');
           }}
-          
           onOpenMap={(dadosAtuais) => {
             setTempFormData(dadosAtuais);
             setCurrentScreen('map');
@@ -200,7 +177,7 @@ function AppContent() {
         onAddPress={() => {
           setEditingItem(null);
           setSelectedLocation(null);
-          setTempFormData(null); // Garante que o form comece limpo
+          setTempFormData(null);
           setCurrentScreen('map');
         }}
         onViewDetail={(item) => {

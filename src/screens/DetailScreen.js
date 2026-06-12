@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-import React from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import MapView, { Marker } from 'react-native-maps';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-
-export const DetailScreen = ({ item, onBack }) => {
-=======
 import React, { useRef } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,7 +11,6 @@ export const DetailScreen = ({ item, onBack }) => {
   const hasCoordinates = item.coordinates && item.coordinates.length > 0;
   const hasLatLng = item.latitude && item.longitude;
 
-  // Quando o mapa carrega, ajusta o zoom para enquadrar todos os pontos
   const handleMapReady = () => {
     if (!mapRef.current) return;
 
@@ -33,15 +22,11 @@ export const DetailScreen = ({ item, onBack }) => {
     } else if (hasLatLng) {
       mapRef.current.fitToCoordinates(
         [{ latitude: item.latitude, longitude: item.longitude }],
-        {
-          edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
-          animated: false,
-        }
+        { edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: false }
       );
     }
   };
 
->>>>>>> feat/api-jwt-security
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -49,21 +34,17 @@ export const DetailScreen = ({ item, onBack }) => {
         <Icon name="arrow-back" size={24} color="#3b82f6" />
         <Text style={styles.backText}>Voltar</Text>
       </TouchableOpacity>
-      
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
           {item.fotoUri && (
             <Image source={{ uri: item.fotoUri }} style={styles.image} />
           )}
-          
+
           <Text style={styles.title}>{item.projeto}</Text>
           <Text style={styles.subtitle}>{item.nome}</Text>
-          
+
           <View style={styles.infoCard}>
-<<<<<<< HEAD
-            <View style={styles.infoRow}>
-              <Icon name="event" size={24} color="#296959" />
-=======
             {item.numeroLicenca ? (
               <View style={styles.infoRow}>
                 <Icon name="confirmation-number" size={24} color="#296959" />
@@ -103,16 +84,15 @@ export const DetailScreen = ({ item, onBack }) => {
                 </View>
               </View>
             ) : null}
-            
+
             <View style={styles.infoRow}>
-               <Icon name="event" size={24} color="#296959" />
->>>>>>> feat/api-jwt-security
+              <Icon name="event" size={24} color="#296959" />
               <View style={styles.infoTextContainer}>
                 <Text style={styles.infoLabel}>Data de Validade</Text>
                 <Text style={styles.infoValue}>{item.validade}</Text>
               </View>
             </View>
-            
+
             <View style={styles.infoRow}>
               <Icon name="info" size={24} color="#10b981" />
               <View style={styles.infoTextContainer}>
@@ -121,19 +101,7 @@ export const DetailScreen = ({ item, onBack }) => {
               </View>
             </View>
           </View>
-          
-<<<<<<< HEAD
-          {item.latitude && item.longitude && (
-            <View style={styles.mapContainer}>
-              <Text style={styles.mapTitle}>Localização:</Text>
-              <MapView
-                style={styles.map}
-                initialRegion={{
-                  latitude: item.latitude,
-                  longitude: item.longitude,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-=======
+
           {(hasCoordinates || hasLatLng) ? (
             <View style={styles.mapContainer}>
               <Text style={styles.mapTitle}>{hasCoordinates ? 'Área selecionada:' : 'Localização:'}</Text>
@@ -146,24 +114,17 @@ export const DetailScreen = ({ item, onBack }) => {
                   longitude: hasCoordinates ? item.coordinates[0].longitude : item.longitude,
                   latitudeDelta: 0.1,
                   longitudeDelta: 0.1,
->>>>>>> feat/api-jwt-security
                 }}
                 scrollEnabled={false}
                 zoomEnabled={false}
               >
-<<<<<<< HEAD
-                <Marker coordinate={{ latitude: item.latitude, longitude: item.longitude }} />
-              </MapView>
-            </View>
-          )}
-=======
                 {hasCoordinates ? (
                   <>
                     {item.coordinates.map((coord, index) => (
                       <Marker key={index} coordinate={coord} />
                     ))}
                     {item.coordinates.length > 2 && (
-                      <Polygon 
+                      <Polygon
                         coordinates={item.coordinates}
                         fillColor="rgba(41, 105, 89, 0.4)"
                         strokeColor="rgba(41, 105, 89, 1)"
@@ -177,7 +138,6 @@ export const DetailScreen = ({ item, onBack }) => {
               </MapView>
             </View>
           ) : null}
->>>>>>> feat/api-jwt-security
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -198,13 +158,7 @@ const styles = StyleSheet.create({
   infoLabel: { fontSize: 14, color: '#9ca3af', marginBottom: 4 },
   infoValue: { fontSize: 16, fontWeight: '600', color: '#111827' },
   statusValue: { fontSize: 18, fontWeight: 'bold' },
-<<<<<<< HEAD
-  mapContainer: { marginBottom: 24 },
-  mapTitle: { fontSize: 18, fontWeight: '600', color: '#111827', marginBottom: 12 },
-  map: { width: '100%', height: 200, borderRadius: 16 },
-=======
   mapContainer: { marginBottom: 24, borderRadius: 16, overflow: 'hidden' },
   mapTitle: { fontSize: 18, fontWeight: '600', color: '#111827', marginBottom: 12 },
   map: { width: '100%', height: 300, borderRadius: 16 },
->>>>>>> feat/api-jwt-security
 });

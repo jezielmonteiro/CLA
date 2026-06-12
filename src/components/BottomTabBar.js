@@ -4,33 +4,26 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export const BottomTabBar = ({ activeTab, onTabChange, onAddPress, insets }) => (
   <View style={[styles.bottomTabBar, { paddingBottom: insets.bottom }]}>
-    <TouchableOpacity style={[styles.tabItem, activeTab === 'home' && styles.tabItemActive]} onPress={() => onTabChange('home')}>
-<<<<<<< HEAD
-      <Icon name="home" size={28} color={activeTab === 'home' ? '#10b981' : '#9ca3af'} />
-      <Text style={[styles.tabLabel, activeTab === 'home' && styles.tabLabelActive]}>Início</Text>
-    </TouchableOpacity>
-    
-=======
+    <TouchableOpacity
+      style={[styles.tabItem, activeTab === 'home' && styles.tabItemActive]}
+      onPress={() => onTabChange('home')}
+    >
       <Icon name="home" size={28} color={activeTab === 'home' ? '#296959' : '#9ca3af'} />
       <Text style={[styles.tabLabel, activeTab === 'home' && styles.tabLabelActive]}>Início</Text>
     </TouchableOpacity>
 
->>>>>>> feat/api-jwt-security
     <TouchableOpacity style={styles.tabItemCenter} onPress={onAddPress}>
       <View style={styles.addButton}>
         <Icon name="add" size={32} color="white" />
       </View>
       <Text style={styles.addButtonLabel}>Adicionar</Text>
     </TouchableOpacity>
-<<<<<<< HEAD
-    
-    <TouchableOpacity style={[styles.tabItem, activeTab === 'stats' && styles.tabItemActive]} onPress={() => onTabChange('stats')}>
-      <Icon name="bar-chart" size={28} color={activeTab === 'stats' ? '#10b981' : '#9ca3af'} />
-=======
 
-    <TouchableOpacity style={[styles.tabItem, activeTab === 'stats' && styles.tabItemActive]} onPress={() => onTabChange('stats')}>
+    <TouchableOpacity
+      style={[styles.tabItem, activeTab === 'stats' && styles.tabItemActive]}
+      onPress={() => onTabChange('stats')}
+    >
       <Icon name="bar-chart" size={28} color={activeTab === 'stats' ? '#296959' : '#9ca3af'} />
->>>>>>> feat/api-jwt-security
       <Text style={[styles.tabLabel, activeTab === 'stats' && styles.tabLabelActive]}>Estatísticas</Text>
     </TouchableOpacity>
   </View>
@@ -56,11 +49,7 @@ const styles = StyleSheet.create({
   },
   tabItem: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 8 },
   tabLabel: { fontSize: 12, color: '#9ca3af', marginTop: 4, fontWeight: '500' },
-<<<<<<< HEAD
-  tabLabelActive: { color: '#10b981', fontWeight: '600' },
-=======
   tabLabelActive: { color: '#296959', fontWeight: '600' },
->>>>>>> feat/api-jwt-security
   tabItemCenter: { alignItems: 'center', justifyContent: 'center', marginTop: -20 },
   addButton: {
     width: 56,
