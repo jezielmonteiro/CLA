@@ -13,7 +13,11 @@ export const Header = ({ onLogout }) => {
           <Text style={styles.headerSubtitle}>Controle de Licenças Ambientais</Text>
         </View>
 
+<<<<<<< HEAD
         <TouchableOpacity onPress={onLogout} style={styles.logoutButton}>
+=======
+        <TouchableOpacity onPress={onLogout} style={styles.logoutButton} testID="logout-button">
+>>>>>>> feat/api-jwt-security
           <Icon name="logout" size={24} color="white" />
         </TouchableOpacity>
       </View>

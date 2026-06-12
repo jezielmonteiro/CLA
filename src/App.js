@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+<<<<<<< HEAD
 import { licenca as initialLicencas } from '../licencas';
+=======
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+>>>>>>> feat/api-jwt-security
 import { useLicenses } from './hooks/useLicenses';
 import { useLocation } from './hooks/useLocation';
 import { getPassword } from './services/auth';
@@ -13,6 +18,17 @@ import { MapScreen } from './screens/MapScreen';
 import { DetailScreen } from './screens/DetailScreen';
 
 export default function App() {
+<<<<<<< HEAD
+=======
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AppContent />
+    </GestureHandlerRootView>
+  );
+}
+
+function AppContent() {
+>>>>>>> feat/api-jwt-security
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentScreen, setCurrentScreen] = useState('login');
   const [editingItem, setEditingItem] = useState(null);
@@ -22,7 +38,11 @@ export default function App() {
   // NOVO: Estado para segurar os dados do formulário enquanto tira foto ou vê mapa
   const [tempFormData, setTempFormData] = useState(null);
   
+<<<<<<< HEAD
   const { licencas, isLoading, loadData, adicionarOuEditar, excluir } = useLicenses(initialLicencas);
+=======
+  const { licencas, isLoading, loadData, adicionarOuEditar, excluir } = useLicenses();
+>>>>>>> feat/api-jwt-security
   const { getLocationPermission } = useLocation();
 
   useEffect(() => {
@@ -56,12 +76,21 @@ export default function App() {
     }
   };
 
+<<<<<<< HEAD
   const handleCameraCapture = (uri) => {
     if (editingItem) {
       handleSave({ ...editingItem, fotoUri: uri });
     } else {
       // Mescla a foto com os dados que já haviam sido digitados no form
       setTempFormData(prev => ({ ...prev, fotoUri: uri }));
+=======
+  const handleCameraCapture = (uri, base64) => {
+    if (editingItem) {
+      handleSave({ ...editingItem, fotoUri: uri, fotoBase64: base64 });
+    } else {
+      // Mescla a foto com os dados que já haviam sido digitados no form
+      setTempFormData(prev => ({ ...prev, fotoUri: uri, fotoBase64: base64 }));
+>>>>>>> feat/api-jwt-security
       setCurrentScreen('form');
     }
   };
@@ -107,7 +136,11 @@ export default function App() {
             onCancel={() => {
               setCurrentScreen('main'); 
             }}
+<<<<<<< HEAD
             initialLocation={editingItem ? { latitude: editingItem.latitude, longitude: editingItem.longitude } : null}
+=======
+            initialLocation={editingItem ? (editingItem.coordinates || (editingItem.latitude ? [{latitude: editingItem.latitude, longitude: editingItem.longitude}] : [])) : null}
+>>>>>>> feat/api-jwt-security
           />
         </SafeAreaProvider>
     );

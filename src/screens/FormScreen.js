@@ -11,28 +11,56 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
   
   const [projeto, setProjeto] = useState(tempData?.projeto || item?.projeto || '');
   const [nome, setNome] = useState(tempData?.nome || item?.nome || '');
+<<<<<<< HEAD
+=======
+  const [numeroLicenca, setNumeroLicenca] = useState(tempData?.numeroLicenca || item?.numeroLicenca || '');
+  const [tipoLicenca, setTipoLicenca] = useState(tempData?.tipoLicenca || item?.tipoLicenca || '');
+  const [dataEmissao, setDataEmissao] = useState(tempData?.dataEmissao || item?.dataEmissao || '');
+  const [empresa, setEmpresa] = useState(tempData?.empresa || item?.empresa || '');
+>>>>>>> feat/api-jwt-security
   const [validade, setValidade] = useState(tempData?.validade || item?.validade || '');
   
   
   const [fotoUri, setFotoUri] = useState(tempData?.fotoUri || item?.fotoUri || null);
+<<<<<<< HEAD
+=======
+  const [fotoBase64, setFotoBase64] = useState(tempData?.fotoBase64 || null);
+>>>>>>> feat/api-jwt-security
 
 
   useEffect(() => {
     if (tempData?.fotoUri) {
       setFotoUri(tempData.fotoUri);
     }
+<<<<<<< HEAD
   }, [tempData?.fotoUri]);
+=======
+    if (tempData?.fotoBase64) {
+      setFotoBase64(tempData.fotoBase64);
+    }
+  }, [tempData?.fotoUri, tempData?.fotoBase64]);
+>>>>>>> feat/api-jwt-security
 
   const salvar = () => {
     if (!projeto.trim()) { Alert.alert('Erro', 'Projeto é obrigatório'); return; }
     if (!validade.trim()) { Alert.alert('Erro', 'Validade é obrigatória'); return; }
+<<<<<<< HEAD
     if (!validarData(validade)) { Alert.alert('Erro', 'Data inválida. Use dd/mm/aaaa'); return; }
     onSave({ projeto, nome, validade, fotoUri });
+=======
+    if (!validarData(validade)) { Alert.alert('Erro', 'Data de Validade inválida. Use dd/mm/aaaa'); return; }
+    if (dataEmissao && !validarData(dataEmissao)) { Alert.alert('Erro', 'Data de Emissão inválida. Use dd/mm/aaaa'); return; }
+    onSave({ projeto, nome, numeroLicenca, tipoLicenca, dataEmissao, empresa, validade, fotoUri, fotoBase64 });
+>>>>>>> feat/api-jwt-security
   };
 
   
   const prepararSaida = (acao) => {
+<<<<<<< HEAD
     const dadosAtuais = { projeto, nome, validade, fotoUri };
+=======
+    const dadosAtuais = { projeto, nome, numeroLicenca, tipoLicenca, dataEmissao, empresa, validade, fotoUri, fotoBase64 };
+>>>>>>> feat/api-jwt-security
     acao(dadosAtuais);
   };
 
@@ -65,6 +93,43 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
           
           <TextInput
             style={styles.input}
+<<<<<<< HEAD
+=======
+            placeholder="Número da Licença"
+            placeholderTextColor="#9ca3af"
+            value={numeroLicenca}
+            onChangeText={setNumeroLicenca}
+          />
+          
+          <TextInput
+            style={styles.input}
+            placeholder="Tipo de Licença (ex: LP, LI, LO)"
+            placeholderTextColor="#9ca3af"
+            value={tipoLicenca}
+            onChangeText={setTipoLicenca}
+          />
+          
+          <TextInput
+            style={styles.input}
+            placeholder="Data de Emissão (dd/mm/aaaa)"
+            placeholderTextColor="#9ca3af"
+            value={dataEmissao}
+            onChangeText={t => setDataEmissao(formatarData(t))}
+            maxLength={10}
+            keyboardType="numeric"
+          />
+          
+          <TextInput
+            style={styles.input}
+            placeholder="Empresa / Responsável"
+            placeholderTextColor="#9ca3af"
+            value={empresa}
+            onChangeText={setEmpresa}
+          />
+          
+          <TextInput
+            style={styles.input}
+>>>>>>> feat/api-jwt-security
             placeholder="Data de Validade (dd/mm/aaaa) *"
             placeholderTextColor="#9ca3af"
             value={validade}
@@ -100,7 +165,11 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
           {selectedLocation && (
             <View style={styles.locationInfo}>
               <Icon name="location-on" size={20} color="#4338ca" />
+<<<<<<< HEAD
               <Text style={styles.locationText}>Localização selecionada</Text>
+=======
+              <Text style={styles.locationText}>{Array.isArray(selectedLocation) ? 'Área selecionada no mapa' : 'Localização selecionada'}</Text>
+>>>>>>> feat/api-jwt-security
             </View>
           )}
           
