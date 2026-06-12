@@ -25,15 +25,6 @@
       },
       "permissions": [
         "ACCESS_COARSE_LOCATION",
-<<<<<<< HEAD
-        "ACCESS_FINE_LOCATION"
-      ]
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-=======
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
       ],
       "package": "com.seuusuario.cla"
@@ -45,7 +36,6 @@
       "eas": {
         "projectId": "369cdb11-ec78-49f9-a12f-e9dd351c0a78"
       }
->>>>>>> feat/api-jwt-security
     }
   }
 }
