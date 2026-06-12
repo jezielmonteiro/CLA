@@ -1,142 +1,84 @@
 import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
-<<<<<<< HEAD
-import { loadLicencas, saveLicencas } from '../services/storage';
-import { calcularStatusPorData, getCorPorStatus, getSigla } from '../utils/statusUtils';
-
-export const useLicenses = (initialLicencas) => {
-=======
 import { loadLicencas, saveLicenca, deleteLicenca } from '../services/storage';
 import { calcularStatusPorData, getCorPorStatus, getSigla } from '../utils/statusUtils';
 
 export const useLicenses = () => {
->>>>>>> feat/api-jwt-security
   const [licencas, setLicencas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
-<<<<<<< HEAD
-    const data = await loadLicencas(initialLicencas);
+    const data = await loadLicencas();
     setLicencas(data);
     setIsLoading(false);
-  }, [initialLicencas]);
-
-  const saveData = useCallback(async (novaLista) => {
-    const success = await saveLicencas(novaLista);
-    if (success) {
-      setLicencas(novaLista);
-      return true;
-    }
-    Alert.alert('Erro', 'Não foi possível salvar as alterações');
-    return false;
-=======
-    try {
-      const data = await loadLicencas();
-      setLicencas(data);
-    } catch (e) {
-      console.error('Erro ao carregar licenças:', e);
-    } finally {
-      setIsLoading(false);
-    }
->>>>>>> feat/api-jwt-security
   }, []);
 
   const adicionarOuEditar = useCallback(async (novoItem, editingItem, selectedLocation) => {
     const statusCalculado = calcularStatusPorData(novoItem.validade);
     const novoItemCompleto = {
       ...novoItem,
+      id: editingItem?.id || null,
       status: statusCalculado,
       cor: getCorPorStatus(statusCalculado),
       sigla: getSigla(statusCalculado),
     };
-    
-<<<<<<< HEAD
-    let novaLista;
+
+    // Trata localização: pode ser array de coordenadas (área) ou ponto único
+    if (Array.isArray(selectedLocation) && selectedLocation.length > 0) {
+      novoItemCompleto.coordinates = selectedLocation;
+      novoItemCompleto.latitude = null;
+      novoItemCompleto.longitude = null;
+    } else if (selectedLocation?.latitude) {
+      novoItemCompleto.latitude = selectedLocation.latitude;
+      novoItemCompleto.longitude = selectedLocation.longitude;
+      novoItemCompleto.coordinates = null;
+    } else if (editingItem) {
+      // Mantém localização existente se não foi alterada
+      novoItemCompleto.coordinates = editingItem.coordinates ?? null;
+      novoItemCompleto.latitude = editingItem.latitude ?? null;
+      novoItemCompleto.longitude = editingItem.longitude ?? null;
+    }
+
+    const salvo = await saveLicenca(novoItemCompleto);
+    if (!salvo) {
+      Alert.alert('Erro', 'Não foi possível salvar as alterações');
+      return false;
+    }
+
+    const itemFinal = {
+      ...salvo,
+      status: calcularStatusPorData(salvo.validade),
+      cor: getCorPorStatus(calcularStatusPorData(salvo.validade)),
+      sigla: getSigla(calcularStatusPorData(salvo.validade)),
+    };
+
     if (editingItem) {
-      novaLista = licencas.map(i => 
-        i.id === editingItem.id ? { 
-          ...i, 
-          ...novoItemCompleto, 
-          latitude: selectedLocation?.latitude ?? i.latitude, 
-          longitude: selectedLocation?.longitude ?? i.longitude 
-        } : i
-      );
+      setLicencas(prev => prev.map(i => i.id === editingItem.id ? itemFinal : i));
     } else {
-      novaLista = [...licencas, {
-        ...novoItemCompleto,
-        id: Date.now().toString(),
-        latitude: selectedLocation?.latitude ?? null,
-        longitude: selectedLocation?.longitude ?? null,
-      }];
-    }
-    return await saveData(novaLista);
-  }, [licencas, saveData]);
-=======
-    let itemParaSalvar;
-    if (editingItem) {
-      itemParaSalvar = { 
-        ...editingItem, 
-        ...novoItemCompleto, 
-        coordinates: selectedLocation ?? editingItem.coordinates ?? null 
-      };
-      // Opcional: remover latitude/longitude antigos se existirem para limpar o banco
-      delete itemParaSalvar.latitude;
-      delete itemParaSalvar.longitude;
-    } else {
-      itemParaSalvar = {
-        ...novoItemCompleto,
-        coordinates: selectedLocation ?? null,
-      };
+      setLicencas(prev => [...prev, itemFinal]);
     }
 
-    const savedItem = await saveLicenca(itemParaSalvar);
-
-    if (savedItem) {
-      // Reconstroi os dados com as propriedades visuais
-      const uiItem = {
-        ...savedItem,
-        status: calcularStatusPorData(savedItem.validade),
-        cor: getCorPorStatus(calcularStatusPorData(savedItem.validade)),
-        sigla: getSigla(calcularStatusPorData(savedItem.validade))
-      };
-
-      setLicencas(prev => {
-        if (editingItem) {
-          return prev.map(i => i.id === uiItem.id ? uiItem : i);
-        } else {
-          return [...prev, uiItem];
-        }
-      });
-      return true;
-    }
-    
-    Alert.alert('Erro', 'Não foi possível salvar as alterações');
-    return false;
-  }, [licencas]);
->>>>>>> feat/api-jwt-security
+    return true;
+  }, []);
 
   const excluir = useCallback(async (id) => {
     Alert.alert('Excluir', 'Tem certeza?', [
       { text: 'Cancelar', style: 'cancel' },
-      { text: 'Excluir', style: 'destructive', onPress: async () => {
-<<<<<<< HEAD
-        const novaLista = licencas.filter(item => item.id !== id);
-        await saveData(novaLista);
-      }}
-    ]);
-  }, [licencas, saveData]);
-=======
-        const success = await deleteLicenca(id);
-        if (success) {
-          setLicencas(prev => prev.filter(item => item.id !== id));
-        } else {
-          Alert.alert('Erro', 'Não foi possível excluir o item do banco');
-        }
-      }}
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          const ok = await deleteLicenca(id);
+          if (ok) {
+            setLicencas(prev => prev.filter(item => item.id !== id));
+          } else {
+            Alert.alert('Erro', 'Não foi possível excluir a licença');
+          }
+        },
+      },
     ]);
   }, []);
->>>>>>> feat/api-jwt-security
 
   return { licencas, isLoading, loadData, adicionarOuEditar, excluir };
 };
