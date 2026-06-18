@@ -1,13 +1,17 @@
-import { collection, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, setDoc, doc, deleteDoc, query, where } from 'firebase/firestore';
 import * as FileSystem from 'expo-file-system/legacy';
-import { db } from '../config/firebase';
+import { db, auth } from '../config/firebase';
 import { calcularStatusPorData, getCorPorStatus, getSigla } from '../utils/statusUtils';
 
 const COLLECTION_NAME = 'licencas';
 
 export const loadLicencas = async (initialLicencas) => {
   try {
-    const querySnapshot = await getDocs(collection(db, COLLECTION_NAME));
+    const user = auth.currentUser;
+    if (!user) return [];
+
+    const q = query(collection(db, COLLECTION_NAME), where('userId', '==', user.uid));
+    const querySnapshot = await getDocs(q);
     const licencasCarregadas = [];
 
     querySnapshot.forEach((docSnap) => {
@@ -46,11 +50,14 @@ export const loadLicencas = async (initialLicencas) => {
 
 export const saveLicenca = async (licenca) => {
   try {
+    const user = auth.currentUser;
+    if (!user) return null;
+
     const docRef = licenca.id
       ? doc(db, COLLECTION_NAME, licenca.id)
       : doc(collection(db, COLLECTION_NAME));
 
-    const licencaParaSalvar = { ...licenca, id: docRef.id };
+    const licencaParaSalvar = { ...licenca, id: docRef.id, userId: user.uid };
 
     // Remove propriedades calculadas antes de salvar
     delete licencaParaSalvar.status;

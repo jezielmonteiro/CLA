@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
+import { ActivityIndicator, View, Text, StyleSheet, Platform, UIManager, LayoutAnimation } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 import { useLicenses } from './hooks/useLicenses';
 import { useLocation } from './hooks/useLocation';
@@ -12,6 +16,8 @@ import { FormScreen } from './screens/FormScreen';
 import { CameraScreen } from './screens/CameraScreen';
 import { MapScreen } from './screens/MapScreen';
 import { DetailScreen } from './screens/DetailScreen';
+import { ProfileScreen } from './screens/ProfileScreen';
+import { ChatScreen } from './screens/ChatScreen';
 
 export default function App() {
   return (
@@ -27,9 +33,16 @@ function AppContent() {
   const [editingItem, setEditingItem] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [targetUser, setTargetUser] = useState(null);
+  const [mainTab, setMainTab] = useState('home');
 
   // Estado para segurar os dados do formulário enquanto tira foto ou vê mapa
   const [tempFormData, setTempFormData] = useState(null);
+
+  const navigate = (screen) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setCurrentScreen(screen);
+  };
 
   const { licencas, isLoading, loadData, adicionarOuEditar, excluir } = useLicenses();
   const { getLocationPermission } = useLocation();
@@ -47,18 +60,18 @@ function AppContent() {
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-    setCurrentScreen('main');
+    navigate('main');
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setCurrentScreen('login');
+    navigate('login');
   };
 
   const handleSave = async (data) => {
     const success = await adicionarOuEditar(data, editingItem, selectedLocation);
     if (success) {
-      setCurrentScreen('main');
+      navigate('main');
       setEditingItem(null);
       setSelectedLocation(null);
       setTempFormData(null);
@@ -70,7 +83,7 @@ function AppContent() {
       handleSave({ ...editingItem, fotoUri: uri, fotoBase64: base64 });
     } else {
       setTempFormData(prev => ({ ...prev, fotoUri: uri, fotoBase64: base64 }));
-      setCurrentScreen('form');
+      navigate('form');
     }
   };
 
@@ -98,7 +111,7 @@ function AppContent() {
       <SafeAreaProvider>
         <CameraScreen
           onCapture={handleCameraCapture}
-          onCancel={() => setCurrentScreen('form')}
+          onCancel={() => navigate('form')}
         />
       </SafeAreaProvider>
     );
@@ -110,10 +123,10 @@ function AppContent() {
         <MapScreen
           onConfirm={(location) => {
             setSelectedLocation(location);
-            setCurrentScreen('form');
+            navigate('form');
           }}
           onCancel={() => {
-            setCurrentScreen('main');
+            navigate('main');
           }}
           initialLocation={
             editingItem
@@ -133,18 +146,18 @@ function AppContent() {
           tempData={tempFormData}
           onSave={handleSave}
           onCancel={() => {
-            setCurrentScreen('main');
+            navigate('main');
             setEditingItem(null);
             setSelectedLocation(null);
             setTempFormData(null);
           }}
           onOpenCamera={(dadosAtuais) => {
             setTempFormData(dadosAtuais);
-            setCurrentScreen('camera');
+            navigate('camera');
           }}
           onOpenMap={(dadosAtuais) => {
             setTempFormData(dadosAtuais);
-            setCurrentScreen('map');
+            navigate('map');
           }}
           selectedLocation={selectedLocation}
           setSelectedLocation={setSelectedLocation}
@@ -158,7 +171,26 @@ function AppContent() {
       <SafeAreaProvider>
         <DetailScreen
           item={selectedItem}
-          onBack={() => setCurrentScreen('main')}
+          onBack={() => navigate('main')}
+        />
+      </SafeAreaProvider>
+    );
+  }
+
+  if (currentScreen === 'profile') {
+    return (
+      <SafeAreaProvider>
+        <ProfileScreen onBack={() => navigate('main')} />
+      </SafeAreaProvider>
+    );
+  }
+
+  if (currentScreen === 'chat') {
+    return (
+      <SafeAreaProvider>
+        <ChatScreen 
+          onBack={() => navigate('main')} 
+          targetUser={targetUser} 
         />
       </SafeAreaProvider>
     );
@@ -167,10 +199,12 @@ function AppContent() {
   return (
     <SafeAreaProvider>
       <MainScreen
+        initialTab={mainTab}
+        onTabChange={setMainTab}
         licencas={licencas}
         onEdit={(item) => {
           setEditingItem(item);
-          setCurrentScreen('form');
+          navigate('form');
         }}
         onDelete={excluir}
         onLogout={handleLogout}
@@ -178,11 +212,16 @@ function AppContent() {
           setEditingItem(null);
           setSelectedLocation(null);
           setTempFormData(null);
-          setCurrentScreen('map');
+          navigate('map');
         }}
         onViewDetail={(item) => {
           setSelectedItem(item);
-          setCurrentScreen('detail');
+          navigate('detail');
+        }}
+        onProfilePress={() => navigate('profile')}
+        onOpenChat={(user) => {
+          setTargetUser(user);
+          navigate('chat');
         }}
       />
     </SafeAreaProvider>

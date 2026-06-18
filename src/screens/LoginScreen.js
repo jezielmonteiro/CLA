@@ -7,6 +7,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useBiometric } from '../hooks/useBiometric';
 import { auth, db } from '../config/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
@@ -67,16 +68,29 @@ export const LoginScreen = ({ onLoginSuccess }) => {
   };
 
   const handleAuth = async () => {
-    if (!email.trim() || !senha.trim()) {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !senha.trim()) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos');
       return;
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      Alert.alert('Erro', 'Por favor, insira um endereço de e-mail válido.');
+      return;
+    }
+
+    if (senha.length < 6) {
+      Alert.alert('Erro', 'A senha deve ter no mínimo 6 caracteres.');
+      return;
+    }
+
     setLoading(true);
     try {
       if (isLoginMode) {
-        await signInWithEmailAndPassword(auth, email.trim(), senha);
+        await signInWithEmailAndPassword(auth, trimmedEmail, senha);
       } else {
-        await createUserWithEmailAndPassword(auth, email.trim(), senha);
+        await createUserWithEmailAndPassword(auth, trimmedEmail, senha);
       }
 
       const isBioConfigured = await AsyncStorage.getItem('@biometrics_configured');
@@ -164,14 +178,17 @@ export const LoginScreen = ({ onLoginSuccess }) => {
               <Text style={{ fontWeight: 'bold', color: '#1b4339' }}>2. Responsabilidades</Text>{'\n'}
               O usuário é responsável pela guarda de suas credenciais de acesso, bem como pela veracidade dos documentos anexados aos processos.
               {'\n\n'}
-              <Text style={{ fontWeight: 'bold', color: '#1b4339' }}>3. Atualizações</Text>{'\n'}
+              <Text style={{ fontWeight: 'bold', color: '#1b4339' }}>3. Troca de Informações</Text>{'\n'}
+              Os usuários poderão trocar informações de forma segura com outros usuários cadastrados na plataforma, respeitando as regras de privacidade e uso.
+              {'\n\n'}
+              <Text style={{ fontWeight: 'bold', color: '#1b4339' }}>4. Atualizações</Text>{'\n'}
               Nos reservamos o direito de atualizar estes termos periodicamente, notificando os usuários sempre que houver mudanças substanciais.
               {'\n\n'}
-              Ao prosseguir, você confirma que leu e concorda com todas as condições descritas acima.
+              Ao prosseguir, você concorda com todas as condições descritas acima e confirma que leu estes termos.
             </Text>
           </ScrollView>
           <TouchableOpacity style={styles.acceptButton} onPress={acceptTerms} activeOpacity={0.8}>
-            <Text style={styles.acceptButtonText}>Li e Concordo</Text>
+            <Text style={styles.acceptButtonText}>Concordo e Li</Text>
             <Ionicons name="checkmark-circle" size={22} color="white" style={{ marginLeft: 8 }} />
           </TouchableOpacity>
         </View>
@@ -207,118 +224,128 @@ export const LoginScreen = ({ onLoginSuccess }) => {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+    <LinearGradient colors={['#115E59', '#059669']} style={styles.container}>
+      <StatusBar style="light" />
+      <SafeAreaView style={{ flex: 1 }}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
-            <View style={styles.header}>
-              <Image source={require('../../assets/icon.png')} style={styles.logoImage} resizeMode="contain" />
-              <Text style={styles.welcomeText}>
-                {isLoginMode ? 'Bem-vindo de volta!' : 'Crie sua conta'}
-              </Text>
-              <Text style={styles.subWelcomeText}>
-                {isLoginMode
-                  ? 'Faça login para continuar gerenciando suas licenças ambientais.'
-                  : 'Preencha os dados abaixo para iniciar sua gestão ambiental.'}
-              </Text>
-            </View>
-
-            <View style={styles.formContainer}>
-
-              <View style={styles.tabContainer}>
-                <Animated.View style={[styles.activeTabBackground, { left: toggleTranslateX }]} />
-                <TouchableOpacity style={styles.tabButton} onPress={() => handleToggleMode(true)}>
-                  <Text style={[styles.tabText, isLoginMode && styles.tabTextActive]}>Entrar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.tabButton} onPress={() => handleToggleMode(false)}>
-                  <Text style={[styles.tabText, !isLoginMode && styles.tabTextActive]}>Cadastrar</Text>
-                </TouchableOpacity>
+              <View style={styles.header}>
+                <Image source={require('../../assets/logo.png')} style={styles.logoImage} resizeMode="stretch" />
+                <Text style={styles.welcomeText}>
+                  {isLoginMode ? 'Bem-vindo !' : 'Crie sua conta'}
+                </Text>
+                <Text style={styles.subWelcomeText}>
+                  {isLoginMode
+                    ? 'Faça login para continuar gerenciando suas licenças ambientais.'
+                    : 'Preencha os dados abaixo para iniciar sua gestão ambiental.'}
+                </Text>
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>E-mail</Text>
-                <View style={styles.inputWrapper}>
-                  <Ionicons name="mail-outline" size={20} color="#6b7280" style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Seu endereço de e-mail"
-                    placeholderTextColor="#9ca3af"
-                    value={email}
-                    onChangeText={setEmail}
-                    autoCapitalize="none"
-                    keyboardType="email-address"
-                  />
-                </View>
-              </View>
+              <View style={styles.formContainer}>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Senha</Text>
-                <View style={styles.inputWrapper}>
-                  <Ionicons name="lock-closed-outline" size={20} color="#6b7280" style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Sua senha secreta"
-                    placeholderTextColor="#9ca3af"
-                    value={senha}
-                    onChangeText={setSenha}
-                    secureTextEntry={!showPassword}
-                  />
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                    <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#6b7280" />
+                <View style={styles.tabContainer}>
+                  <Animated.View style={[styles.activeTabBackground, { left: toggleTranslateX }]} />
+                  <TouchableOpacity style={styles.tabButton} onPress={() => handleToggleMode(true)}>
+                    <Text style={[styles.tabText, isLoginMode && styles.tabTextActive]}>Entrar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.tabButton} onPress={() => handleToggleMode(false)}>
+                    <Text style={[styles.tabText, !isLoginMode && styles.tabTextActive]}>Cadastrar</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
 
-              {loading || isAuthenticating ? (
-                <View style={styles.loadingWrapper}>
-                  <ActivityIndicator size="large" color="#296959" />
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>E-mail</Text>
+                  <View style={styles.inputWrapper}>
+                    <Ionicons name="mail-outline" size={20} color="#6b7280" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Seu endereço de e-mail"
+                      placeholderTextColor="#9ca3af"
+                      value={email}
+                      onChangeText={setEmail}
+                      autoCapitalize="none"
+                      keyboardType="email-address"
+                    />
+                  </View>
                 </View>
-              ) : (
-                <TouchableOpacity
-                  style={[styles.primaryButton, !isLoginMode && { backgroundColor: '#0284c7', shadowColor: '#0284c7' }]}
-                  onPress={handleAuth}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.primaryButtonText}>{isLoginMode ? 'Entrar' : 'Cadastrar'}</Text>
-                  <Ionicons
-                    name={isLoginMode ? 'log-in-outline' : 'person-add-outline'}
-                    size={20}
-                    color="white"
-                    style={{ marginLeft: 8 }}
-                  />
-                </TouchableOpacity>
-              )}
 
-            </View>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Senha</Text>
+                  <View style={styles.inputWrapper}>
+                    <Ionicons name="lock-closed-outline" size={20} color="#6b7280" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Sua senha secreta"
+                      placeholderTextColor="#9ca3af"
+                      value={senha}
+                      onChangeText={setSenha}
+                      secureTextEntry={!showPassword}
+                    />
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                      <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#6b7280" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
 
-          </ScrollView>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+                {loading || isAuthenticating ? (
+                  <View style={styles.loadingWrapper}>
+                    <ActivityIndicator size="large" color="#296959" />
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={[styles.primaryButton, !isLoginMode && { backgroundColor: '#0284c7', shadowColor: '#0284c7' }]}
+                    onPress={handleAuth}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.primaryButtonText}>{isLoginMode ? 'Entrar' : 'Cadastrar'}</Text>
+                    <Ionicons
+                      name={isLoginMode ? 'log-in-outline' : 'person-add-outline'}
+                      size={20}
+                      color="white"
+                      style={{ marginLeft: 8 }}
+                    />
+                  </TouchableOpacity>
+                )}
+
+              </View>
+              
+              {/* Espaço extra no fim da página para o teclado não engolir o formulário */}
+              <View style={{ height: 100 }} />
+            </ScrollView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0fdf4' },
-  container: { flex: 1, backgroundColor: '#f0fdf4' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#115E59' },
+  container: { flex: 1 },
   scrollContainer: { flexGrow: 1, justifyContent: 'center', padding: 24 },
 
-  header: { alignItems: 'center', marginBottom: 32, marginTop: 20 },
-  logoImage: { width: 100, height: 100, marginBottom: 20 },
-  welcomeText: { fontSize: 26, fontWeight: '800', color: '#1b4339', textAlign: 'center', marginBottom: 8 },
-  subWelcomeText: { fontSize: 15, color: '#4b5563', textAlign: 'center', paddingHorizontal: 10, lineHeight: 22 },
+  header: { alignItems: 'center', marginBottom: 32, marginTop: 10 },
+  logoImage: {
+    width: 96,
+    height: 96,
+    marginBottom: 24,
+    borderRadius: 20,
+    padding: 8,
+  },
+  welcomeText: { fontSize: 28, fontWeight: '900', color: 'white', textAlign: 'center', marginBottom: 8 },
+  subWelcomeText: { fontSize: 15, color: 'rgba(255, 255, 255, 0.8)', textAlign: 'center', paddingHorizontal: 10, lineHeight: 22 },
 
   formContainer: {
     backgroundColor: 'white',
     padding: 24,
-    borderRadius: 24,
+    borderRadius: 32,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
   },
 
   tabContainer: {
@@ -372,17 +399,17 @@ const styles = StyleSheet.create({
 
   primaryButton: {
     flexDirection: 'row',
-    backgroundColor: '#296959',
+    backgroundColor: '#059669',
     height: 56,
-    borderRadius: 16,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 12,
-    shadowColor: '#296959',
+    shadowColor: '#059669',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
   },
   primaryButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
 

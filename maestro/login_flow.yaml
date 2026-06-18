@@ -5,9 +5,9 @@ appId: host.exp.exponent
 # Caso os termos de uso estejam visíveis (primeira execução), aceitamos eles
 - runFlow:
     when:
-      visible: "Li e Concordo"
+      visible: "Concordo e Li"
     commands:
-      - tapOn: "Li e Concordo"
+      - tapOn: "Concordo e Li"
 
 # Preenche credenciais de e-mail e senha
 - tapOn: "Seu endereço de e-mail"

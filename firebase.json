@@ -1,0 +1,21 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": [
+      {
+        "collectionGroup": "classes",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "code",
+            "order": "ASCENDING"
+          }
+        ]
+      }
+    ]
+  }
+}

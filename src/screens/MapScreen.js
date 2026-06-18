@@ -21,8 +21,8 @@ export const MapScreen = ({ onConfirm, onCancel, initialLocation }) => {
     const coords = {
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
     };
 
     mapRef.current?.animateToRegion(coords, 1000);
@@ -59,8 +59,8 @@ export const MapScreen = ({ onConfirm, onCancel, initialLocation }) => {
         initialRegion={{
           latitude: -23.5505,
           longitude: -46.6333,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
         }}
         onPress={handleMapPress}
         onPoiClick={handlePoiClick}

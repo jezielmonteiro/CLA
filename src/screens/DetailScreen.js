@@ -41,15 +41,15 @@ export const DetailScreen = ({ item, onBack }) => {
             <Image source={{ uri: item.fotoUri }} style={styles.image} />
           )}
 
-          <Text style={styles.title}>{item.projeto}</Text>
-          <Text style={styles.subtitle}>{item.nome}</Text>
+          <Text style={styles.title}>{item.projeto || 'Empreendimento'}</Text>
+          <Text style={styles.subtitle}>{item.nome || 'Órgão Emissor'}</Text>
 
           <View style={styles.infoCard}>
             {item.numeroLicenca ? (
               <View style={styles.infoRow}>
-                <Icon name="confirmation-number" size={24} color="#296959" />
+                <Icon name="folder" size={24} color="#296959" />
                 <View style={styles.infoTextContainer}>
-                  <Text style={styles.infoLabel}>Número da Licença</Text>
+                  <Text style={styles.infoLabel}>Número do Processo</Text>
                   <Text style={styles.infoValue}>{item.numeroLicenca}</Text>
                 </View>
               </View>
@@ -59,7 +59,7 @@ export const DetailScreen = ({ item, onBack }) => {
               <View style={styles.infoRow}>
                 <Icon name="category" size={24} color="#296959" />
                 <View style={styles.infoTextContainer}>
-                  <Text style={styles.infoLabel}>Tipo de Licença</Text>
+                  <Text style={styles.infoLabel}>Fase da Licença</Text>
                   <Text style={styles.infoValue}>{item.tipoLicenca}</Text>
                 </View>
               </View>
@@ -67,9 +67,9 @@ export const DetailScreen = ({ item, onBack }) => {
 
             {item.empresa ? (
               <View style={styles.infoRow}>
-                <Icon name="business" size={24} color="#296959" />
+                <Icon name="warning" size={24} color="#296959" />
                 <View style={styles.infoTextContainer}>
-                  <Text style={styles.infoLabel}>Empresa / Responsável</Text>
+                  <Text style={styles.infoLabel}>Condicionantes / Observações</Text>
                   <Text style={styles.infoValue}>{item.empresa}</Text>
                 </View>
               </View>

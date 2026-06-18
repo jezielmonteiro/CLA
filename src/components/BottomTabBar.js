@@ -2,29 +2,43 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-export const BottomTabBar = ({ activeTab, onTabChange, onAddPress, insets }) => (
+export const BottomTabBar = ({ activeTab, onTabChange, onAddPress, onLogout, insets }) => (
   <View style={[styles.bottomTabBar, { paddingBottom: insets.bottom }]}>
     <TouchableOpacity
       style={[styles.tabItem, activeTab === 'home' && styles.tabItemActive]}
       onPress={() => onTabChange('home')}
     >
-      <Icon name="home" size={28} color={activeTab === 'home' ? '#296959' : '#9ca3af'} />
+      <Icon name="home" size={26} color={activeTab === 'home' ? '#059669' : '#9ca3af'} />
       <Text style={[styles.tabLabel, activeTab === 'home' && styles.tabLabelActive]}>Início</Text>
     </TouchableOpacity>
 
-    <TouchableOpacity style={styles.tabItemCenter} onPress={onAddPress}>
+    <TouchableOpacity
+      style={[styles.tabItem, activeTab === 'chat' && styles.tabItemActive]}
+      onPress={() => onTabChange('chat')}
+    >
+      <Icon name="chat" size={26} color={activeTab === 'chat' ? '#059669' : '#9ca3af'} />
+      <Text style={[styles.tabLabel, activeTab === 'chat' && styles.tabLabelActive]}>Mensagens</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.tabItem} onPress={onAddPress} testID="addButton" accessibilityLabel="Adicionar">
       <View style={styles.addButton}>
-        <Icon name="add" size={32} color="white" />
+        <Icon name="add" size={28} color="white" />
       </View>
-      <Text style={styles.addButtonLabel}>Adicionar</Text>
     </TouchableOpacity>
 
     <TouchableOpacity
       style={[styles.tabItem, activeTab === 'stats' && styles.tabItemActive]}
       onPress={() => onTabChange('stats')}
     >
-      <Icon name="bar-chart" size={28} color={activeTab === 'stats' ? '#296959' : '#9ca3af'} />
-      <Text style={[styles.tabLabel, activeTab === 'stats' && styles.tabLabelActive]}>Estatísticas</Text>
+      <Icon name="bar-chart" size={26} color={activeTab === 'stats' ? '#059669' : '#9ca3af'} />
+      <Text style={[styles.tabLabel, activeTab === 'stats' && styles.tabLabelActive]}>Gráficos</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={styles.tabItem}
+      onPress={onLogout}
+    >
+      <Icon name="logout" size={26} color="#9ca3af" />
+      <Text style={[styles.tabLabel, { color: '#9ca3af' }]}>Sair</Text>
     </TouchableOpacity>
   </View>
 );
@@ -33,7 +47,7 @@ const styles = StyleSheet.create({
   bottomTabBar: {
     flexDirection: 'row',
     backgroundColor: 'white',
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
     position: 'absolute',
@@ -45,24 +59,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 8,
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  tabItem: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 8 },
-  tabLabel: { fontSize: 12, color: '#9ca3af', marginTop: 4, fontWeight: '500' },
-  tabLabelActive: { color: '#296959', fontWeight: '600' },
-  tabItemCenter: { alignItems: 'center', justifyContent: 'center', marginTop: -20 },
+  tabItem: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  tabLabel: { fontSize: 11, color: '#9ca3af', marginTop: 4, fontWeight: '500' },
+  tabLabelActive: { color: '#059669', fontWeight: '700' },
   addButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#296959',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#059669',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#296959',
+    shadowColor: '#059669',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 5,
+    elevation: 4,
   },
-  addButtonLabel: { fontSize: 11, color: '#296959', marginTop: 4, fontWeight: '600' },
 });

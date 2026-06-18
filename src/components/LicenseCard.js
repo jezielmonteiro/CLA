@@ -58,7 +58,7 @@ export const LicenseCard = ({ item, onPress, onEdit, onDelete }) => {
       rightThreshold={40}
       containerStyle={styles.swipeableContainer}
     >
-      <TouchableOpacity style={styles.card} activeOpacity={0.95} onPress={onPress}>
+      <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress}>
         {item.fotoUri ? (
           <Image source={{ uri: item.fotoUri }} style={styles.cardImage} />
         ) : (
@@ -71,9 +71,9 @@ export const LicenseCard = ({ item, onPress, onEdit, onDelete }) => {
         <View style={styles.cardContent}>
           <View style={styles.headerRow}>
             <View style={styles.titleContainer}>
-              <Text style={styles.cardTitle} numberOfLines={1}>{item.projeto}</Text>
+              <Text style={styles.cardTitle} numberOfLines={1}>{item.projeto || 'Sem Empreendimento'}</Text>
               <Text style={styles.cardSubtitle} numberOfLines={1}>
-                {item.numeroLicenca ? `Nº ${item.numeroLicenca} • ${item.nome}` : item.nome}
+                {item.numeroLicenca ? `Proc. Nº ${item.numeroLicenca} • ${item.nome}` : item.nome || 'Órgão não informado'}
               </Text>
             </View>
             <View style={[styles.statusBadge, { backgroundColor: item.cor + '20' }]}>
@@ -89,13 +89,13 @@ export const LicenseCard = ({ item, onPress, onEdit, onDelete }) => {
               <View style={styles.infoRow}>
                 <MaterialCommunityIcons name="clipboard-text-outline" size={16} color="#64748b" />
                 <Text style={styles.infoText} numberOfLines={1}>
-                  {item.tipoLicenca || 'Não definido'}
+                  {item.tipoLicenca ? `Fase: ${item.tipoLicenca}` : 'Fase não definida'}
                 </Text>
               </View>
               <View style={styles.infoRow}>
-                <MaterialCommunityIcons name="domain" size={16} color="#64748b" />
+                <MaterialCommunityIcons name="alert-circle-outline" size={16} color="#64748b" />
                 <Text style={styles.infoText} numberOfLines={1}>
-                  {item.empresa || 'Empresa N/A'}
+                  {item.empresa ? 'Com condicionantes' : 'Sem observações'}
                 </Text>
               </View>
             </View>
@@ -127,15 +127,15 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: 'white',
-    borderRadius: 24,
+    borderRadius: 28,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+    shadowColor: '#64748b',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.15,
+    shadowRadius: 32,
     elevation: 8,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: 'rgba(226, 232, 240, 0.6)',
   },
   cardImage: {
     width: '100%',
@@ -170,8 +170,8 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   cardTitle: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 21,
+    fontWeight: '900',
     color: '#0f172a',
     marginBottom: 4,
     letterSpacing: -0.5,

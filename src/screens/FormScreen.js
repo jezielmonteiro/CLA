@@ -3,7 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingVi
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { formatarData, validarData } from '../utils/dateUtils';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { formatarData, validarData, converterDataParaDate } from '../utils/dateUtils';
 
 export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, selectedLocation, setSelectedLocation, tempData }) => {
   const insets = useSafeAreaInsets();
@@ -19,13 +20,16 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
   const [fotoUri, setFotoUri] = useState(tempData?.fotoUri || item?.fotoUri || null);
   const [fotoBase64, setFotoBase64] = useState(tempData?.fotoBase64 || null);
 
+  const [showPickerEmissao, setShowPickerEmissao] = useState(false);
+  const [showPickerValidade, setShowPickerValidade] = useState(false);
+
   useEffect(() => {
     if (tempData?.fotoUri) setFotoUri(tempData.fotoUri);
     if (tempData?.fotoBase64) setFotoBase64(tempData.fotoBase64);
   }, [tempData?.fotoUri, tempData?.fotoBase64]);
 
   const salvar = () => {
-    if (!projeto.trim()) { Alert.alert('Erro', 'Projeto é obrigatório'); return; }
+    if (!projeto.trim()) { Alert.alert('Erro', 'Empreendimento é obrigatório'); return; }
     if (!validade.trim()) { Alert.alert('Erro', 'Validade é obrigatória'); return; }
     if (!validarData(validade)) { Alert.alert('Erro', 'Data de Validade inválida. Use dd/mm/aaaa'); return; }
     if (dataEmissao && !validarData(dataEmissao)) { Alert.alert('Erro', 'Data de Emissão inválida. Use dd/mm/aaaa'); return; }
@@ -35,6 +39,21 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
   const prepararSaida = (acao) => {
     const dadosAtuais = { projeto, nome, numeroLicenca, tipoLicenca, dataEmissao, empresa, validade, fotoUri, fotoBase64 };
     acao(dadosAtuais);
+  };
+
+  const handleDateChange = (event, selectedDate, setter, setPickerState) => {
+    if (Platform.OS !== 'ios') {
+      setPickerState(false);
+    }
+    if (event.type === 'dismissed') {
+      return;
+    }
+    if (selectedDate) {
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const year = selectedDate.getFullYear();
+      setter(`${day}/${month}/${year}`);
+    }
   };
 
   return (
@@ -48,65 +67,96 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
 
           <Text style={styles.title}>{item ? 'Editar Licença' : 'Nova Licença'}</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Nome do Projeto *"
-            placeholderTextColor="#9ca3af"
-            value={projeto}
-            onChangeText={setProjeto}
-          />
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Empreendimento / Atividade *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: Loteamento Bosque Verde"
+              placeholderTextColor="#9ca3af"
+              value={projeto}
+              onChangeText={setProjeto}
+            />
+          </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Órgão Emissor / Descrição"
-            placeholderTextColor="#9ca3af"
-            value={nome}
-            onChangeText={setNome}
-          />
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Órgão Emissor</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: IBAMA, CETESB, FEPAM"
+              placeholderTextColor="#9ca3af"
+              value={nome}
+              onChangeText={setNome}
+            />
+          </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Número da Licença"
-            placeholderTextColor="#9ca3af"
-            value={numeroLicenca}
-            onChangeText={setNumeroLicenca}
-          />
+          <View style={styles.row}>
+            <View style={[styles.inputContainer, { flex: 1, marginRight: 8, marginHorizontal: 0 }]}>
+              <Text style={styles.label}>Fase da Licença</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ex: LP, LI, LO"
+                placeholderTextColor="#9ca3af"
+                value={tipoLicenca}
+                onChangeText={setTipoLicenca}
+              />
+            </View>
+            <View style={[styles.inputContainer, { flex: 1, marginLeft: 8, marginHorizontal: 0 }]}>
+              <Text style={styles.label}>Nº do Processo</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ex: 12345/2023"
+                placeholderTextColor="#9ca3af"
+                value={numeroLicenca}
+                onChangeText={setNumeroLicenca}
+              />
+            </View>
+          </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Tipo de Licença (ex: LP, LI, LO)"
-            placeholderTextColor="#9ca3af"
-            value={tipoLicenca}
-            onChangeText={setTipoLicenca}
-          />
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Condicionantes / Observações</Text>
+            <TextInput
+              style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
+              placeholder="Descreva as condicionantes ou restrições pendentes..."
+              placeholderTextColor="#9ca3af"
+              value={empresa}
+              onChangeText={setEmpresa}
+              multiline
+            />
+          </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Data de Emissão (dd/mm/aaaa)"
-            placeholderTextColor="#9ca3af"
-            value={dataEmissao}
-            onChangeText={t => setDataEmissao(formatarData(t))}
-            maxLength={10}
-            keyboardType="numeric"
-          />
+          <View style={styles.row}>
+            <View style={[styles.inputContainer, { flex: 1, marginRight: 8, marginHorizontal: 0 }]}>
+              <Text style={styles.label}>Data de Emissão</Text>
+              <TouchableOpacity style={styles.dateInput} onPress={() => setShowPickerEmissao(true)}>
+                 <Text style={styles.dateText}>{dataEmissao || "dd/mm/aaaa"}</Text>
+                 <Icon name="calendar-today" size={20} color="#6b7280" />
+              </TouchableOpacity>
+              {showPickerEmissao && (
+                <DateTimePicker
+                  value={converterDataParaDate(dataEmissao) || new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event, date) => handleDateChange(event, date, setDataEmissao, setShowPickerEmissao)}
+                />
+              )}
+            </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Empresa / Responsável"
-            placeholderTextColor="#9ca3af"
-            value={empresa}
-            onChangeText={setEmpresa}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Data de Validade (dd/mm/aaaa) *"
-            placeholderTextColor="#9ca3af"
-            value={validade}
-            onChangeText={t => setValidade(formatarData(t))}
-            maxLength={10}
-            keyboardType="numeric"
-          />
+            <View style={[styles.inputContainer, { flex: 1, marginLeft: 8, marginHorizontal: 0 }]}>
+              <Text style={styles.label}>Data de Validade *</Text>
+              <TouchableOpacity style={styles.dateInput} onPress={() => setShowPickerValidade(true)}>
+                 <Text style={styles.dateText}>{validade || "dd/mm/aaaa"}</Text>
+                 <Icon name="event" size={20} color="#296959" />
+              </TouchableOpacity>
+              {showPickerValidade && (
+                <DateTimePicker
+                  value={converterDataParaDate(validade) || new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event, date) => handleDateChange(event, date, setValidade, setShowPickerValidade)}
+                />
+              )}
+            </View>
+          </View>
 
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.mapButton} onPress={() => prepararSaida(onOpenMap)}>
@@ -116,7 +166,7 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
 
             <TouchableOpacity style={styles.cameraButton} onPress={() => prepararSaida(onOpenCamera)}>
               <Icon name="camera-alt" size={20} color="#296959" />
-              <Text style={styles.cameraButtonText}>Foto</Text>
+              <Text style={styles.cameraButtonText}>Documento</Text>
             </TouchableOpacity>
           </View>
 
@@ -141,7 +191,7 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
 
           <TouchableOpacity style={styles.saveButton} onPress={salvar}>
             <Icon name="check" size={20} color="white" />
-            <Text style={styles.buttonText}> Salvar</Text>
+            <Text style={styles.buttonText}> Salvar Licença</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -153,8 +203,13 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8fafc' },
   closeButton: { alignSelf: 'flex-end', padding: 16 },
   title: { fontSize: 32, fontWeight: 'bold', color: '#111827', marginBottom: 24, paddingHorizontal: 24 },
-  input: { backgroundColor: 'white', marginHorizontal: 24, padding: 16, borderRadius: 12, marginBottom: 16, borderWidth: 1, borderColor: '#e2e8f0', fontSize: 16, color: '#1e293b' },
-  buttonRow: { flexDirection: 'row', gap: 12, marginHorizontal: 24, marginBottom: 16 },
+  row: { flexDirection: 'row', marginHorizontal: 24 },
+  inputContainer: { marginBottom: 16, marginHorizontal: 24 },
+  label: { fontSize: 14, fontWeight: '600', color: '#475569', marginBottom: 6 },
+  input: { backgroundColor: 'white', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0', fontSize: 16, color: '#1e293b' },
+  dateInput: { backgroundColor: 'white', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  dateText: { fontSize: 16, color: '#1e293b' },
+  buttonRow: { flexDirection: 'row', gap: 12, marginHorizontal: 24, marginBottom: 16, marginTop: 8 },
   mapButton: { flex: 1, backgroundColor: '#e0e7ff', padding: 16, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 },
   mapButtonText: { color: '#4338ca', fontSize: 16, fontWeight: '600' },
   cameraButton: { flex: 1, backgroundColor: '#6ee7b7', padding: 16, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 },

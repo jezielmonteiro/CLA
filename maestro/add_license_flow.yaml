@@ -4,7 +4,8 @@ appId: host.exp.exponent
 - assertVisible: "Controle de Licenças Ambientais"
 
 # Toca no botão de adicionar na barra inferior
-- tapOn: "Adicionar"
+- tapOn:
+    id: "addButton"
 
 # Chega na tela de Mapa. Marcamos 3 pontos para criar um polígono de área
 - tapOn:
