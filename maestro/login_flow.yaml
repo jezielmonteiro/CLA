@@ -1,10 +1,9 @@
 appId: host.exp.exponent
 ---
-- waitForAnimationToEnd
-
 # Se o botão de adicionar não estiver visível (ou seja, não estamos logados/na tela principal), executa o sub-fluxo de login
 - runFlow:
     file: sub_login_flow.yaml
     when:
       notVisible:
-        id: "addButton"
+        id: "addButton" 
+        
