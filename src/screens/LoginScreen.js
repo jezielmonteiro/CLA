@@ -234,7 +234,7 @@ export const LoginScreen = ({ onLoginSuccess }) => {
               <View style={styles.header}>
                 <Image source={require('../../assets/logo.png')} style={styles.logoImage} resizeMode="stretch" />
                 <Text style={styles.welcomeText}>
-                  {isLoginMode ? 'Bem-vindo !' : 'Crie sua conta'}
+                  {isLoginMode ? 'Bem-vindo!' : 'Crie sua conta'}
                 </Text>
                 <Text style={styles.subWelcomeText}>
                   {isLoginMode

@@ -30,8 +30,8 @@ export const ProfileScreen = ({ onBack }) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         setNome(data.nome || '');
-        setTelefone(data.telefone || '');
-        setCpfCnpj(data.cpfCnpj || '');
+        setTelefone(formatTelefone(data.telefone || ''));
+        setCpfCnpj(formatCPFCNPJ(data.cpfCnpj || ''));
         setCargo(data.cargo || '');
         setEmpresa(data.empresa || '');
         setAvatarUri(data.avatarUri || null);
@@ -95,6 +95,47 @@ export const ProfileScreen = ({ onBack }) => {
         { text: 'Cancelar', style: 'cancel' }
       ]
     );
+  };
+
+  const formatCPFCNPJ = (value) => {
+    const cleanValue = value.replace(/\D/g, '');
+    if (cleanValue.length <= 11) {
+      return cleanValue
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+        .replace(/(-\d{2})\d+?$/, '$1');
+    } else {
+      return cleanValue
+        .replace(/(\d{2})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1/$2')
+        .replace(/(\d{4})(\d{1,2})/, '$1-$2')
+        .replace(/(-\d{2})\d+?$/, '$1');
+    }
+  };
+
+  const formatTelefone = (value) => {
+    const cleanValue = value.replace(/\D/g, '');
+    if (cleanValue.length <= 10) {
+      return cleanValue
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{4})(\d)/, '$1-$2')
+        .replace(/(-\d{4})\d+?$/, '$1');
+    } else {
+      return cleanValue
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{5})(\d)/, '$1-$2')
+        .replace(/(-\d{4})\d+?$/, '$1');
+    }
+  };
+
+  const handleCpfCnpjChange = (text) => {
+    setCpfCnpj(formatCPFCNPJ(text));
+  };
+
+  const handleTelefoneChange = (text) => {
+    setTelefone(formatTelefone(text));
   };
 
   const handleSave = async () => {
@@ -174,7 +215,15 @@ export const ProfileScreen = ({ onBack }) => {
             <Text style={styles.label}>CPF ou CNPJ</Text>
             <View style={styles.inputWrapper}>
               <Ionicons name="card-outline" size={20} color="#6b7280" style={styles.inputIcon} />
-              <TextInput testID="profileCpfInput" style={styles.input} value={cpfCnpj} onChangeText={setCpfCnpj} placeholder="000.000.000-00" keyboardType="numeric" />
+              <TextInput
+                testID="profileCpfInput"
+                style={styles.input}
+                value={cpfCnpj}
+                onChangeText={handleCpfCnpjChange}
+                placeholder="000.000.000-00 ou 00.000.000/0000-00"
+                keyboardType="numeric"
+                maxLength={18}
+              />
             </View>
           </View>
 
@@ -198,7 +247,15 @@ export const ProfileScreen = ({ onBack }) => {
             <Text style={styles.label}>Telefone de Contato</Text>
             <View style={styles.inputWrapper}>
               <Ionicons name="call-outline" size={20} color="#6b7280" style={styles.inputIcon} />
-              <TextInput testID="profileTelefoneInput" style={styles.input} value={telefone} onChangeText={setTelefone} placeholder="(00) 00000-0000" keyboardType="phone-pad" />
+              <TextInput
+                testID="profileTelefoneInput"
+                style={styles.input}
+                value={telefone}
+                onChangeText={handleTelefoneChange}
+                placeholder="(00) 00000-0000"
+                keyboardType="phone-pad"
+                maxLength={15}
+              />
             </View>
           </View>
 
