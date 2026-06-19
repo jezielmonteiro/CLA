@@ -27,6 +27,12 @@ appId: host.exp.exponent
 - eraseText
 - inputText: "12345678901"
 
+# Desce para mostrar todos os campos
+- swipe:
+    direction: DOWN
+- swipe:
+    direction: DOWN
+
 # Empresa / Organização
 - tapOn:
     id: "profileEmpresaInput"
