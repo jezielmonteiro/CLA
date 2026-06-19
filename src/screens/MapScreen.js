@@ -103,7 +103,7 @@ export const MapScreen = ({ onConfirm, onCancel, initialLocation }) => {
           <Text style={styles.buttonText}>Confirmar Área</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
+        <TouchableOpacity testID="closeMapButton" style={styles.cancelButton} onPress={onCancel}>
           <Text style={styles.buttonText}>Voltar</Text>
         </TouchableOpacity>
       </View>

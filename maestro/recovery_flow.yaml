@@ -1,0 +1,25 @@
+appId: host.exp.exponent
+---
+# Desliza para baixo (rola para cima) para expor os botões de fechar que podem ter ficado ocultos no topo
+- swipe:
+    direction: DOWN
+- swipe:
+    direction: DOWN
+
+# Se estiver na câmera, fecha a câmera
+- tapOn:
+    id: "closeCameraButton"
+    optional: true
+- waitForAnimationToEnd
+
+# Se estiver no mapa, fecha o mapa
+- tapOn:
+    id: "closeMapButton"
+    optional: true
+- waitForAnimationToEnd
+
+# Se estiver no formulário, fecha o formulário
+- tapOn:
+    id: "closeFormButton"
+    optional: true
+- waitForAnimationToEnd

@@ -1,0 +1,21 @@
+appId: host.exp.exponent
+---
+# Data de Emissão (Opcional)
+- tapOn:
+    id: "dateEmissaoButton"
+- waitForAnimationToEnd
+
+# Confirma a data padrão (hoje) no DatePicker nativo Android
+- tapOn:
+    id: "android:id/button1"
+- waitForAnimationToEnd
+
+# Data de Validade (Obrigatória)
+- tapOn:
+    id: "dateValidadeButton"
+- waitForAnimationToEnd
+
+# Confirma a data padrão (hoje) no DatePicker nativo Android
+- tapOn:
+    id: "android:id/button1"
+- waitForAnimationToEnd

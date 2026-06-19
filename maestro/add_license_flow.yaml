@@ -1,52 +1,116 @@
 appId: host.exp.exponent
 ---
 # Assumimos que o login já foi feito e estamos na tela principal
-- assertVisible: "Controle de Licenças Ambientais"
+
+# Confirma que estamos na tela principal
+- assertVisible:
+    id: "addButton"
 
 # Toca no botão de adicionar na barra inferior
 - tapOn:
     id: "addButton"
+- waitForAnimationToEnd
 
 # Chega na tela de Mapa. Marcamos 3 pontos para criar um polígono de área
 - tapOn:
-    x: 50%
-    y: 40%
+    point: "50%,40%"
 - tapOn:
-    x: 40%
-    y: 50%
+    point: "40%,50%"
 - tapOn:
-    x: 60%
-    y: 50%
+    point: "60%,50%"
 
 # Confirma a área selecionada
 - tapOn: "Confirmar Área"
+- waitForAnimationToEnd
 
-# Agora estamos na tela de formulário. Preenchemos os campos
-- tapOn: "Nome do Projeto *"
+# Agora estamos na tela de formulário (FormScreen)
+
+# Empreendimento / Atividade
+- tapOn: "Ex: Loteamento Bosque Verde"
 - inputText: "Projeto E2E Maestro"
 
-- tapOn: "Órgão Emissor / Descrição"
+# Órgão Emissor
+- tapOn: "Ex: IBAMA, CETESB, FEPAM"
 - inputText: "IBAMA"
 
-- tapOn: "Número da Licença"
-- inputText: "12345/2026"
-
-- tapOn: "Tipo de Licença (ex: LP, LI, LO)"
+# Fase da Licença
+- tapOn: "Ex: LP, LI, LO"
 - inputText: "LO"
 
-- tapOn: "Data de Emissão (dd/mm/aaaa)"
-- inputText: "01012026"
-
-- tapOn: "Empresa / Responsável"
-- inputText: "Maestro Tests Corp"
-
-- tapOn: "Data de Validade (dd/mm/aaaa) *"
-- inputText: "01012028"
+# Nº do Processo
+- tapOn: "Ex: 12345/2023"
+- inputText: "12345/2026"
 
 - hideKeyboard
+- waitForAnimationToEnd
 
-# Clica em Salvar
-- tapOn: "Salvar"
+# Scroll down para garantir que os botões de data estejam visíveis
+- scrollUntilVisible:
+    element:
+      id: "dateValidadeButton"
+    direction: DOWN
+    timeout: 5000
 
-# Verifica se o card criado com o nome do projeto está visível na lista
+# Data de Emissão (Opcional)
+- tapOn:
+    id: "dateEmissaoButton"
+- waitForAnimationToEnd
+- tapOn:
+    id: "android:id/button1"
+- waitForAnimationToEnd
+
+# Data de Validade (Obrigatória)
+- tapOn:
+    id: "dateValidadeButton"
+- waitForAnimationToEnd
+- tapOn:
+    id: "android:id/button1"
+- waitForAnimationToEnd
+
+# Scroll down para o botão de câmera (Documento)
+- scrollUntilVisible:
+    element:
+      id: "documentButton"
+    direction: DOWN
+    timeout: 5000
+
+# Abre a câmera para tirar foto do documento
+- tapOn:
+    id: "documentButton"
+- waitForAnimationToEnd
+
+# Tira a foto
+- tapOn:
+    id: "captureButton"
+- waitForAnimationToEnd
+
+# Volta para o formulário automaticamente após a foto
+
+# Scroll down para garantir que o botão Salvar esteja visível
+- scrollUntilVisible:
+    element:
+      id: "saveLicenseButton"
+    direction: DOWN
+    timeout: 5000
+
+# Salva a Licença
+- tapOn:
+    id: "saveLicenseButton"
+- waitForAnimationToEnd
+
+# Se houver diálogo de debug, clica em OK
+- runFlow:
+    when:
+      visible: "OK"
+    commands:
+      - tapOn: "OK"
+      - waitForAnimationToEnd
+
+# Aguarda voltar para a tela principal
+- extendedWaitUntil:
+    visible:
+      id: "addButton"
+    timeout: 10000
+
+# Verifica se o card criado está visível na lista
 - assertVisible: "Projeto E2E Maestro"

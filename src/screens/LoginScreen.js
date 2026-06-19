@@ -248,7 +248,7 @@ export const LoginScreen = ({ onLoginSuccess }) => {
                 <View style={styles.tabContainer}>
                   <Animated.View style={[styles.activeTabBackground, { left: toggleTranslateX }]} />
                   <TouchableOpacity style={styles.tabButton} onPress={() => handleToggleMode(true)}>
-                    <Text style={[styles.tabText, isLoginMode && styles.tabTextActive]}>Entrar</Text>
+                    <Text style={[styles.tabText, isLoginMode && styles.tabTextActive]}>Login</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.tabButton} onPress={() => handleToggleMode(false)}>
                     <Text style={[styles.tabText, !isLoginMode && styles.tabTextActive]}>Cadastrar</Text>
@@ -310,7 +310,7 @@ export const LoginScreen = ({ onLoginSuccess }) => {
                 )}
 
               </View>
-              
+
               {/* Espaço extra no fim da página para o teclado não engolir o formulário */}
               <View style={{ height: 100 }} />
             </ScrollView>

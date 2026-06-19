@@ -64,6 +64,39 @@ export const ProfileScreen = ({ onBack }) => {
     }
   };
 
+  const takePhoto = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (permissionResult.granted === false) {
+      Alert.alert('Permissão necessária', 'É necessário permitir o acesso à câmera para tirar uma foto.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.1,
+      base64: true,
+      cameraType: 'front',
+    });
+
+    if (!result.canceled && result.assets[0].base64) {
+      setAvatarUri(`data:image/jpeg;base64,${result.assets[0].base64}`);
+    }
+  };
+
+  const handleAvatarPress = () => {
+    Alert.alert(
+      'Foto de Perfil',
+      'Como deseja atualizar sua foto?',
+      [
+        { text: 'Tirar uma Selfie', onPress: takePhoto },
+        { text: 'Escolher da Galeria', onPress: pickImage },
+        { text: 'Cancelar', style: 'cancel' }
+      ]
+    );
+  };
+
   const handleSave = async () => {
     if (!nome.trim()) {
       Alert.alert('Aviso', 'O nome não pode estar vazio.');
@@ -105,7 +138,7 @@ export const ProfileScreen = ({ onBack }) => {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" backgroundColor="white" />
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+        <TouchableOpacity testID="profileBackButton" onPress={onBack} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#1f2937" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Editar Perfil</Text>
@@ -114,8 +147,8 @@ export const ProfileScreen = ({ onBack }) => {
 
       <View style={styles.contentContainer}>
         <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
-          <ScrollView contentContainerStyle={styles.content}>
-          <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
+          <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
+          <TouchableOpacity testID="profileAvatarButton" style={styles.avatarContainer} onPress={handleAvatarPress}>
              <View style={styles.avatar}>
                {avatarUri ? (
                  <Image source={{ uri: avatarUri }} style={styles.avatarImage} />
@@ -133,7 +166,7 @@ export const ProfileScreen = ({ onBack }) => {
             <Text style={styles.label}>Nome Completo</Text>
             <View style={styles.inputWrapper}>
               <Ionicons name="person-outline" size={20} color="#6b7280" style={styles.inputIcon} />
-              <TextInput style={styles.input} value={nome} onChangeText={setNome} placeholder="Seu nome" />
+              <TextInput testID="profileNomeInput" style={styles.input} value={nome} onChangeText={setNome} placeholder="Seu nome" />
             </View>
           </View>
 
@@ -141,7 +174,7 @@ export const ProfileScreen = ({ onBack }) => {
             <Text style={styles.label}>CPF ou CNPJ</Text>
             <View style={styles.inputWrapper}>
               <Ionicons name="card-outline" size={20} color="#6b7280" style={styles.inputIcon} />
-              <TextInput style={styles.input} value={cpfCnpj} onChangeText={setCpfCnpj} placeholder="000.000.000-00" keyboardType="numeric" />
+              <TextInput testID="profileCpfInput" style={styles.input} value={cpfCnpj} onChangeText={setCpfCnpj} placeholder="000.000.000-00" keyboardType="numeric" />
             </View>
           </View>
 
@@ -149,7 +182,7 @@ export const ProfileScreen = ({ onBack }) => {
             <Text style={styles.label}>Empresa / Organização Atual</Text>
             <View style={styles.inputWrapper}>
               <Ionicons name="business-outline" size={20} color="#6b7280" style={styles.inputIcon} />
-              <TextInput style={styles.input} value={empresa} onChangeText={setEmpresa} placeholder="Ex: Secretaria de Meio Ambiente" />
+              <TextInput testID="profileEmpresaInput" style={styles.input} value={empresa} onChangeText={setEmpresa} placeholder="Ex: Secretaria de Meio Ambiente" />
             </View>
           </View>
 
@@ -157,7 +190,7 @@ export const ProfileScreen = ({ onBack }) => {
             <Text style={styles.label}>Cargo / Ocupação</Text>
             <View style={styles.inputWrapper}>
               <Ionicons name="briefcase-outline" size={20} color="#6b7280" style={styles.inputIcon} />
-              <TextInput style={styles.input} value={cargo} onChangeText={setCargo} placeholder="Ex: Engenheiro Ambiental" />
+              <TextInput testID="profileCargoInput" style={styles.input} value={cargo} onChangeText={setCargo} placeholder="Ex: Engenheiro Ambiental" />
             </View>
           </View>
 
@@ -165,11 +198,11 @@ export const ProfileScreen = ({ onBack }) => {
             <Text style={styles.label}>Telefone de Contato</Text>
             <View style={styles.inputWrapper}>
               <Ionicons name="call-outline" size={20} color="#6b7280" style={styles.inputIcon} />
-              <TextInput style={styles.input} value={telefone} onChangeText={setTelefone} placeholder="(00) 00000-0000" keyboardType="phone-pad" />
+              <TextInput testID="profileTelefoneInput" style={styles.input} value={telefone} onChangeText={setTelefone} placeholder="(00) 00000-0000" keyboardType="phone-pad" />
             </View>
           </View>
 
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={saving}>
+          <TouchableOpacity testID="profileSaveButton" style={styles.saveButton} onPress={handleSave} disabled={saving}>
              {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveButtonText}>Salvar Alterações</Text>}
           </TouchableOpacity>
           </ScrollView>

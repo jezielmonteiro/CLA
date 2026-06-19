@@ -1,0 +1,64 @@
+appId: host.exp.exponent
+---
+# Assumimos que o login já foi feito e estamos na tela principal
+
+# Confirma que estamos na tela principal
+- assertVisible:
+    id: "addButton"
+
+# Toca no botão de perfil no cabeçalho
+- tapOn:
+    id: "profileButton"
+- waitForAnimationToEnd
+
+# Agora estamos na tela de perfil (ProfileScreen)
+- assertVisible: "Editar Perfil"
+
+# Preenche os campos
+# Nome Completo
+- tapOn:
+    id: "profileNomeInput"
+- eraseText
+- inputText: "Usuario Teste Maestro"
+
+# CPF ou CNPJ
+- tapOn:
+    id: "profileCpfInput"
+- eraseText
+- inputText: "12345678901"
+
+# Empresa / Organização
+- tapOn:
+    id: "profileEmpresaInput"
+- eraseText
+- inputText: "Secretaria de Testes"
+
+# Cargo / Ocupação
+- tapOn:
+    id: "profileCargoInput"
+- eraseText
+- inputText: "Testador E2E"
+
+# Telefone
+- tapOn:
+    id: "profileTelefoneInput"
+- eraseText
+- inputText: "11999999999"
+
+# Esconde o teclado
+- hideKeyboard
+- waitForAnimationToEnd
+
+# Toca em salvar
+- tapOn:
+    id: "profileSaveButton"
+- waitForAnimationToEnd
+
+# O salvamento exibe um alerta nativo do sistema ("Sucesso", "Perfil atualizado com sucesso!")
+# Clicamos em "OK" no alerta nativo para limpá-lo
+- tapOn: "OK"
+- waitForAnimationToEnd
+
+# Confirma que voltou à tela principal
+- assertVisible:
+    id: "addButton"

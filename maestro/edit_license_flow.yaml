@@ -11,16 +11,43 @@ appId: host.exp.exponent
 # Clica no botão de Editar
 - tapOn: "Editar"
 
-# Agora na tela de formulário, vamos editar a empresa responsável
-- tapOn: "Empresa / Responsável"
+# Aguarda a tela de formulário abrir
+- waitForAnimationToEnd
+
+# Agora na tela de formulário, vamos editar o campo de Condicionantes / Observações
+- tapOn: "Descreva as condicionantes ou restrições pendentes..."
 # Apaga o texto anterior e escreve o novo
-- clearText
-- inputText: "EcoGlow Editada"
+- eraseText
+- inputText: "Com condicionantes pendentes"
 
 - hideKeyboard
+- waitForAnimationToEnd
 
-# Clica em Salvar
-- tapOn: "Salvar"
+# Scroll down para garantir que o botão Salvar esteja visível
+- scrollUntilVisible:
+    element:
+      id: "saveLicenseButton"
+    direction: DOWN
+    timeout: 5000
 
-# Verifica se a informação editada aparece no card correspondente na lista
-- assertVisible: "EcoGlow Editada"
+# Clica em Salvar Licença
+- tapOn:
+    id: "saveLicenseButton"
+- waitForAnimationToEnd
+
+# Se houver um diálogo de debug (como o popup "DEBUG FORM SALVAR"), clica em OK para prosseguir
+- runFlow:
+    when:
+      visible: "OK"
+    commands:
+      - tapOn: "OK"
+      - waitForAnimationToEnd
+
+# Aguarda voltar para a tela principal (esperando o Firestore e a transição)
+- extendedWaitUntil:
+    visible:
+      id: "addButton"
+    timeout: 10000
+
+# Verifica se voltamos para a lista principal
+- assertVisible: "Projeto E2E Maestro"

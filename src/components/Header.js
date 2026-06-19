@@ -46,7 +46,7 @@ export const Header = ({ onProfilePress }) => {
 
         <View style={styles.actionsContainer}>
           {onProfilePress && (
-            <TouchableOpacity onPress={onProfilePress} style={styles.profileButton}>
+            <TouchableOpacity testID="profileButton" onPress={onProfilePress} style={styles.profileButton}>
               {avatarUri ? (
                 <Image source={{ uri: avatarUri }} style={styles.avatarImage} />
               ) : (

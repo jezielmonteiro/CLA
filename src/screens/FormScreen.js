@@ -60,8 +60,8 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}>
-          <TouchableOpacity onPress={onCancel} style={styles.closeButton}>
+        <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}>
+          <TouchableOpacity testID="closeFormButton" onPress={onCancel} style={styles.closeButton}>
             <Icon name="close" size={24} color="#6b7280" />
           </TouchableOpacity>
 
@@ -127,7 +127,7 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
           <View style={styles.row}>
             <View style={[styles.inputContainer, { flex: 1, marginRight: 8, marginHorizontal: 0 }]}>
               <Text style={styles.label}>Data de Emissão</Text>
-              <TouchableOpacity style={styles.dateInput} onPress={() => setShowPickerEmissao(true)}>
+              <TouchableOpacity testID="dateEmissaoButton" style={styles.dateInput} onPress={() => setShowPickerEmissao(true)}>
                  <Text style={styles.dateText}>{dataEmissao || "dd/mm/aaaa"}</Text>
                  <Icon name="calendar-today" size={20} color="#6b7280" />
               </TouchableOpacity>
@@ -143,7 +143,7 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
 
             <View style={[styles.inputContainer, { flex: 1, marginLeft: 8, marginHorizontal: 0 }]}>
               <Text style={styles.label}>Data de Validade *</Text>
-              <TouchableOpacity style={styles.dateInput} onPress={() => setShowPickerValidade(true)}>
+              <TouchableOpacity testID="dateValidadeButton" style={styles.dateInput} onPress={() => setShowPickerValidade(true)}>
                  <Text style={styles.dateText}>{validade || "dd/mm/aaaa"}</Text>
                  <Icon name="event" size={20} color="#296959" />
               </TouchableOpacity>
@@ -164,7 +164,7 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
               <Text style={styles.mapButtonText}>Localização</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.cameraButton} onPress={() => prepararSaida(onOpenCamera)}>
+            <TouchableOpacity testID="documentButton" style={styles.cameraButton} onPress={() => prepararSaida(onOpenCamera)}>
               <Icon name="camera-alt" size={20} color="#296959" />
               <Text style={styles.cameraButtonText}>Documento</Text>
             </TouchableOpacity>
@@ -189,7 +189,7 @@ export const FormScreen = ({ item, onSave, onCancel, onOpenCamera, onOpenMap, se
             </View>
           )}
 
-          <TouchableOpacity style={styles.saveButton} onPress={salvar}>
+          <TouchableOpacity testID="saveLicenseButton" style={styles.saveButton} onPress={salvar}>
             <Icon name="check" size={20} color="white" />
             <Text style={styles.buttonText}> Salvar Licença</Text>
           </TouchableOpacity>

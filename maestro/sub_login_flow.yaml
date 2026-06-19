@@ -1,0 +1,28 @@
+appId: host.exp.exponent
+---
+# Aceita os Termos de Uso se aparecerem
+- tapOn:
+    text: "Concordo e Li"
+    optional: true
+- waitForAnimationToEnd
+
+# Preenche credenciais de e-mail e senha
+- tapOn: "Seu endereço de e-mail"
+- inputText: "test@cla.com"
+- tapOn: "Sua senha secreta"
+- inputText: "password123"
+- hideKeyboard
+
+# Clica no botão Entrar
+- tapOn: "Entrar"
+- waitForAnimationToEnd
+
+# Pula a biometria se a opção aparecer
+- tapOn:
+    text: "Pular por enquanto"
+    optional: true
+- waitForAnimationToEnd
+
+# Confirma que chegamos à tela principal
+- assertVisible:
+    id: "addButton"
