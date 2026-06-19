@@ -72,7 +72,7 @@ export const ChatScreen = ({ onBack, targetUser }) => {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" backgroundColor="white" />
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+        <TouchableOpacity testID="chatBackButton" onPress={onBack} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#1f2937" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{targetUser.nome || targetUser.email}</Text>
@@ -94,13 +94,17 @@ export const ChatScreen = ({ onBack, targetUser }) => {
           )}
           <View style={styles.inputContainer}>
             <TextInput
+              testID="chatMessageInput"
               style={styles.input}
               value={text}
               onChangeText={setText}
               placeholder="Digite uma mensagem..."
               placeholderTextColor="#9ca3af"
+              autoCapitalize="sentences"
+              autoCorrect={true}
+              multiline={false}
             />
-            <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+            <TouchableOpacity testID="chatSendButton" style={styles.sendButton} onPress={sendMessage}>
               <Ionicons name="send" size={20} color="white" />
             </TouchableOpacity>
           </View>

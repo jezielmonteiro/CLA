@@ -1,0 +1,42 @@
+appId: host.exp.exponent
+---
+# Teste da Aba de Mensagens e Contatos
+- runFlow: sub_login_flow.yaml
+
+# 1. Acessar a aba de mensagens
+- tapOn: "Mensagens"
+- assertVisible: "Mensagens"
+
+# 2. Navegar para a lista de contatos/usuários
+- runFlow:
+    when:
+      visible: "Você ainda não possui conversas ativas."
+    commands:
+      - tapOn: "Ver Contatos"
+
+- runFlow:
+    when:
+      visible: "Conversas" # Sub-tab ativo se já houver chats
+    commands:
+      - tapOn: "Contatos" # Muda para a aba de busca de usuários
+
+# 3. Na tela de Lista de Usuários (UsersListScreen)
+- tapOn: "Buscar por nome ou email..."
+- inputText: "Jeziel"
+- hideKeyboard
+- tapOn: "Conversar"
+
+# 4. Na tela de Chat (ChatScreen)
+- assertVisible: "Digite uma mensagem..."
+- tapOn: "Digite uma mensagem..."
+- inputText: "Teste automatizado Maestro sem acentos"
+- tapOn:
+    id: "chatSendButton"
+
+# 5. Validar envio e voltar
+- assertVisible: "Teste automatizado Maestro sem acentos"
+- tapOn:
+    id: "chatBackButton"
+
+# 6. Validar que voltou para a Inbox
+- assertVisible: "Mensagens"
