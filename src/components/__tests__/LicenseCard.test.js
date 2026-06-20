@@ -28,9 +28,9 @@ describe('LicenseCard Component', () => {
     );
 
     expect(getByText('Reflorestamento Local')).toBeTruthy();
-    expect(getByText('Nº 2026-999 • Licença Prévia')).toBeTruthy();
-    expect(getByText('Prévia')).toBeTruthy();
-    expect(getByText('EcoGlow Ltda')).toBeTruthy();
+    expect(getByText('Proc. Nº 2026-999 • Licença Prévia')).toBeTruthy();
+    expect(getByText('Fase: Prévia')).toBeTruthy();
+    expect(getByText('Com condicionantes')).toBeTruthy();
     expect(getByText('01/05/2026')).toBeTruthy();
     expect(getByText('Vence: 01/06/2026')).toBeTruthy();
     expect(getByText('VNC')).toBeTruthy();
