@@ -4,12 +4,13 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { collection, getDocs, doc, updateDoc, query, orderBy } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db, auth } from '../config/firebase';
 import { Header } from '../components/Header';
 import { BottomTabBar } from '../components/BottomTabBar';
 import { LicenseCard } from '../components/LicenseCard';
 import { StatsScreen } from '../components/StatsScreen';
 import { deletePassword } from '../services/auth';
+import { signOut } from 'firebase/auth';
 
 import { InboxScreen } from './InboxScreen';
 import { UsersListScreen } from './UsersListScreen';
@@ -27,8 +28,14 @@ export const MainScreen = ({ initialTab = 'home', onTabChange, licencas, onEdit,
         text: 'Sair', 
         style: 'destructive', 
         onPress: async () => { 
-          await deletePassword(); 
-          onLogout(); 
+          try {
+            await deletePassword();
+            await signOut(auth);
+          } catch (e) {
+            console.log('Erro ao deslogar:', e);
+          } finally {
+            onLogout();
+          }
         } 
       }
     ]);

@@ -20,7 +20,8 @@ appId: host.exp.exponent
     point: "60%,50%"
 
 # Confirma a área selecionada
-- tapOn: "Confirmar Área"
+- tapOn:
+    id: "confirmAreaButton"
 - waitForAnimationToEnd
 
 # Agora estamos na tela de formulário (FormScreen)

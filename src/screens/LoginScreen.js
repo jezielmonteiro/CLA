@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert,
   Image, StyleSheet, KeyboardAvoidingView, Platform, ScrollView,
@@ -11,8 +11,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useBiometric } from '../hooks/useBiometric';
 import { auth, db } from '../config/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
+import { savePassword } from '../services/auth';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 const { width, height } = Dimensions.get('window');
 
@@ -26,25 +28,38 @@ export const LoginScreen = ({ onLoginSuccess }) => {
   const [slideAnim] = useState(new Animated.Value(0));
   const [termsAccepted, setTermsAccepted] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const isAuthenticatingRef = useRef(false);
 
   const { isBiometricCompatible, isAuthenticating, authenticateBiometry } = useBiometric();
 
   useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user && !isAuthenticatingRef.current) {
+        const accepted = await AsyncStorage.getItem('@terms_accepted');
+        const userAcceptedBio = await AsyncStorage.getItem('@use_registered_biometrics');
+        if (accepted === 'true' && userAcceptedBio === 'true') {
+          isAuthenticatingRef.current = true;
+          // Pequeno delay para garantir que a UI carregou
+          setTimeout(async () => {
+            const success = await authenticateBiometry();
+            if (success) {
+              onLoginSuccess();
+            } else {
+              isAuthenticatingRef.current = false;
+            }
+          }, 500);
+        }
+      }
+    });
+
     checkInitialState();
-  }, []);
+    return () => unsubscribe();
+  }, [isBiometricCompatible]);
 
   const checkInitialState = async () => {
     try {
       const accepted = await AsyncStorage.getItem('@terms_accepted');
       setTermsAccepted(accepted === 'true');
-
-      if (accepted === 'true') {
-        const userAcceptedBio = await AsyncStorage.getItem('@use_registered_biometrics');
-        if (userAcceptedBio === 'true' && auth.currentUser) {
-          const success = await authenticateBiometry();
-          if (success) onLoginSuccess();
-        }
-      }
     } catch (e) {
       console.log('Error initializing', e);
       setTermsAccepted(false);
@@ -70,7 +85,7 @@ export const LoginScreen = ({ onLoginSuccess }) => {
   const handleAuth = async () => {
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !senha.trim()) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos');
+      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       return;
     }
 
@@ -86,22 +101,65 @@ export const LoginScreen = ({ onLoginSuccess }) => {
     }
 
     setLoading(true);
+    isAuthenticatingRef.current = true;
     try {
       if (isLoginMode) {
-        await signInWithEmailAndPassword(auth, trimmedEmail, senha);
+        const userCredential = await signInWithEmailAndPassword(auth, trimmedEmail, senha);
+        const user = userCredential.user;
+        await savePassword(senha);
+
+        // Envolve a parte de sincronização e biometria em um try-catch interno
+        // para que falhas aqui não impeçam o login bem-sucedido do Firebase
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const localBio = await AsyncStorage.getItem('@use_registered_biometrics');
+          let biometriaHabilitada = localBio === 'true';
+
+          if (userDoc.exists()) {
+            const firestoreBio = userDoc.data().biometriaHabilitada === true;
+            // Se o Firestore diz que está habilitado, atualiza o local
+            if (firestoreBio) {
+              biometriaHabilitada = true;
+              await AsyncStorage.setItem('@use_registered_biometrics', 'true');
+              await AsyncStorage.setItem('@biometrics_configured', 'true');
+            }
+          }
+
+          if (biometriaHabilitada) {
+            const hasHardware = await LocalAuthentication.hasHardwareAsync();
+            const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+            if (hasHardware && isEnrolled) {
+              // Pequeno delay para garantir que o teclado fechou e a UI estabilizou
+              await new Promise(resolve => setTimeout(resolve, 500));
+              await LocalAuthentication.authenticateAsync({
+                promptMessage: "Autentique para acessar o CLA",
+                fallbackLabel: "Usar senha",
+                disableDeviceFallback: false,
+              });
+            }
+          }
+        } catch (syncError) {
+          console.log('Erro de sincronização pós-login (não crítico):', syncError);
+        }
+
+        onLoginSuccess();
       } else {
+        // No Cadastro: Sempre tenta oferecer a biometria se o hardware for compatível
         await createUserWithEmailAndPassword(auth, trimmedEmail, senha);
-      }
+        await savePassword(senha);
 
-      const isBioConfigured = await AsyncStorage.getItem('@biometrics_configured');
+        let compatible = isBiometricCompatible;
+        if (compatible === null) {
+          const hasHardware = await LocalAuthentication.hasHardwareAsync();
+          const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+          compatible = hasHardware && isEnrolled;
+        }
 
-      if (isBioConfigured !== null) {
-        const userAcceptedBio = await AsyncStorage.getItem('@use_registered_biometrics');
-        await finalizarLogin(userAcceptedBio === 'true');
-      } else if (isBiometricCompatible) {
-        setShowBioOption(true);
-      } else {
-        await finalizarLogin(false);
+        if (compatible) {
+          setShowBioOption(true);
+        } else {
+          await finalizarLogin(false);
+        }
       }
     } catch (error) {
       console.log('Firebase Error:', error);
@@ -126,26 +184,55 @@ export const LoginScreen = ({ onLoginSuccess }) => {
       Alert.alert('Erro', errorMsg);
     } finally {
       setLoading(false);
+      isAuthenticatingRef.current = false;
     }
   };
 
   const finalizarLogin = async (useBiometricFlag = false) => {
+    if (loading) return; // Evita chamadas duplicadas se já estiver processando
+
     try {
+      setLoading(true);
+      isAuthenticatingRef.current = true;
+
+      // Só pede biometria agora se ele CLICOU em "Habilitar Biometria"
+      if (useBiometricFlag) {
+        const success = await authenticateBiometry();
+        if (!success) {
+          Alert.alert('Autenticação necessária', 'Para habilitar a biometria, você precisa autenticar agora.');
+          isAuthenticatingRef.current = false;
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Salva a decisão (Habilitar ou Pular)
       await AsyncStorage.setItem('@biometrics_configured', 'true');
       await AsyncStorage.setItem('@use_registered_biometrics', useBiometricFlag ? 'true' : 'false');
 
-      if (auth.currentUser) {
-        await setDoc(doc(db, 'users', auth.currentUser.uid), {
-          email: auth.currentUser.email,
-          biometriaHabilitada: useBiometricFlag,
-          updatedAt: new Date().toISOString(),
-        }, { merge: true });
+      // Tenta salvar no Firestore, mas não bloqueia o login se falhar
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          await setDoc(doc(db, 'users', user.uid), {
+            email: user.email,
+            biometriaHabilitada: useBiometricFlag,
+            updatedAt: new Date().toISOString(),
+          }, { merge: true });
+        }
+      } catch (firestoreError) {
+        console.log('Erro não crítico ao salvar no Firestore:', firestoreError);
       }
 
+      // Navega para o App
       onLoginSuccess();
     } catch (error) {
+      isAuthenticatingRef.current = false;
       console.error('Erro ao finalizar login:', error);
       Alert.alert('Erro', 'Falha ao concluir o processo de login');
+    } finally {
+      // Se não navegou (deu erro), libera o loading
+      setLoading(false);
     }
   };
 
@@ -208,10 +295,10 @@ export const LoginScreen = ({ onLoginSuccess }) => {
             Deseja habilitar o acesso com biometria para entrar no aplicativo mais rapidamente na próxima vez?
           </Text>
           <TouchableOpacity style={styles.primaryButton} onPress={() => finalizarLogin(true)}>
-            <Text style={styles.primaryButtonText}>Habilitar Biometria</Text>
+            <Text style={styles.primaryButtonText}>Sim</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.secondaryButton} onPress={() => finalizarLogin(false)}>
-            <Text style={styles.secondaryButtonText}>Pular por enquanto</Text>
+            <Text style={styles.secondaryButtonText}>Não</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -234,7 +321,7 @@ export const LoginScreen = ({ onLoginSuccess }) => {
               <View style={styles.header}>
                 <Image source={require('../../assets/logo.png')} style={styles.logoImage} resizeMode="stretch" />
                 <Text style={styles.welcomeText}>
-                  {isLoginMode ? 'Bem-vindo!' : 'Crie sua conta'}
+                  {isLoginMode ? 'Bem-vindo(a)!' : 'Crie sua conta'}
                 </Text>
                 <Text style={styles.subWelcomeText}>
                   {isLoginMode
@@ -405,6 +492,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 12,
+    width: '100%',
     shadowColor: '#059669',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

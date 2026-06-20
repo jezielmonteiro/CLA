@@ -80,7 +80,11 @@ export const ChatScreen = ({ onBack, targetUser }) => {
       </View>
 
       <View style={styles.contentContainer}>
-        <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 100}
+        >
           {loading ? (
             <View style={styles.center}><ActivityIndicator size="large" color="#296959" /></View>
           ) : (

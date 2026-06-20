@@ -21,7 +21,18 @@ export const useBiometric = () => {
   };
 
   const authenticateBiometry = async () => {
-    if (!isBiometricCompatible) return true;
+    // Se explicitamente não compatível, retornamos false
+    if (isBiometricCompatible === false) return false;
+
+    // Se ainda está carregando, esperamos ou verificamos agora
+    if (isBiometricCompatible === null) {
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      const compatible = hasHardware && isEnrolled;
+      setIsBiometricCompatible(compatible);
+      if (!compatible) return false;
+    }
+
     setIsAuthenticating(true);
     try {
       const result = await LocalAuthentication.authenticateAsync({

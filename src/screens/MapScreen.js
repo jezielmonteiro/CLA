@@ -93,6 +93,7 @@ export const MapScreen = ({ onConfirm, onCancel, initialLocation }) => {
 
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
+          testID="confirmAreaButton"
           style={styles.confirmButton}
           onPress={() =>
             selectedLocations.length >= 3

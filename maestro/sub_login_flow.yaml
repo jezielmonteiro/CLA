@@ -19,7 +19,7 @@ appId: host.exp.exponent
 
 # Pula a biometria se a opção aparecer
 - tapOn:
-    text: "Pular por enquanto"
+    text: "Não"
     optional: true
 - waitForAnimationToEnd
 
